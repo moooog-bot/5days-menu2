@@ -22,7 +22,7 @@
     .container {
       max-width: 750px;
       margin: 0 auto;
-      text-align: left; /* 入力項目が多いため左寄せで見やすく */
+      text-align: left;
     }
 
     h1 {
@@ -39,7 +39,6 @@
       text-align: center;
     }
 
-    /* 入力フォームのエリア */
     .form-section {
       background-color: #fafafa;
       padding: 25px 30px;
@@ -75,7 +74,6 @@
       resize: vertical;
     }
 
-    /* スクショ選択エリア */
     .screenshot-zone {
       border: 1px dashed #cccccc;
       background-color: #ffffff;
@@ -111,7 +109,6 @@
       background-color: #555555;
     }
 
-    /* ローディング */
     .loading {
       display: none;
       font-size: 14px;
@@ -120,7 +117,7 @@
       text-align: center;
     }
 
-    /* AI出力結果表示エリア */
+    /* AI出力結果表示エリア（HTML表示用に調整） */
     .result-section {
       display: none;
       background-color: #ffffff;
@@ -128,9 +125,16 @@
       border-radius: 8px;
       padding: 30px;
       margin-top: 20px;
-      white-space: pre-wrap; /* AIが返した改行をそのまま綺麗に表示 */
       font-size: 15px;
-      line-height: 1.7;
+      line-height: 1.8;
+    }
+    .result-section h2, .result-section h3 {
+      margin-top: 25px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 5px;
+    }
+    .result-section ul {
+      padding-left: 20px;
     }
   </style>
 </head>
@@ -184,10 +188,9 @@
 </div>
 
 <script>
-  // 🔑 取得したAPIキーを下のシングルクォーテーションの中に貼り付けてください
-  const GEMINI_API_KEY = 'AQ.Ab8RN6KnMC1xtFywzpVBySJ9N56UTEEsPQbbK34AG7mBDoY1jAAQ.Ab8RN6IpqpFDKeTdkr06SjD6pBPqfGM3uBu9uK0u9pSBjRNX6w';
+  // 🔑 取得したAPIキーをここに貼り付けてください（改行なしの1行で！）
+  const GEMINI_API_KEY = 'YAQ.Ab8RN6IpqpFDKeTdkr06SjD6pBPqfGM3uBu9uK0u9pSBjRNX6wOUR_GEMINI_API_KEY_HERE';
 
-  // 画面ロード時に、前回の常備食材や手持ち食材を自動で復元（LocalStorage機能）
   window.onload = function() {
     if(localStorage.getItem('stock_ing')) document.getElementById('stockIngredients').value = localStorage.getItem('stock_ing');
     if(localStorage.getItem('prior_ing')) document.getElementById('priorityIngredients').value = localStorage.getItem('prior_ing');
@@ -200,7 +203,6 @@
     const loadingText = document.getElementById("loadingText");
     const resultArea = document.getElementById("resultArea");
     
-    // 入力値を保存しておく（次回開いたときに入力し直す手間を省くため）
     localStorage.setItem('stock_ing', document.getElementById('stockIngredients').value);
     localStorage.setItem('prior_ing', document.getElementById('priorityIngredients').value);
     localStorage.setItem('always_ing', document.getElementById('alwaysIngredients').value);
@@ -211,7 +213,6 @@
 
     let screenshotText = "なし";
 
-    // もしスクショがあれば、まずスクショから料理名と食材を読み取る
     if (fileInput.files.length > 0) {
       try {
         const aiParsed = await analyzeScreenshot(fileInput.files[0]);
@@ -222,18 +223,16 @@
       }
     }
 
-    // 本番の献立作成プロンプトを組み立てて送信
     try {
       await generateMenuPlan(screenshotText);
     } catch (error) {
-      alert("通信エラーが発生しました。もう一度試してみてください。");
+      alert("通信エラーまたはAPIエラーが発生しました。もう一度試してみてください。");
       console.error(error);
     }
 
     loadingText.style.display = "none";
   }
 
-  // スクショ画像を1つめのAI（Gemini Flash）に投げて文字起こしする関数
   async function analyzeScreenshot(file) {
     const base64Data = await new Promise((resolve) => {
       const reader = new FileReader();
@@ -254,11 +253,20 @@
     });
 
     const json = await response.json();
+    if (!json.candidates || json.candidates.length === 0) {
+      throw new Error("スクショの解析に失敗しました。");
+    }
+    
     const responseText = json.candidates[0].content.parts[0].text.trim();
-    return JSON.parse(responseText.replace(/```json|```/g, ""));
+    
+    // 【改善点】余計なテキストが入っても、{} の中身だけを強引に抽出してパースする
+    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      throw new Error("有効なJSONデータが返されませんでした。");
+    }
+    return JSON.parse(jsonMatch[0]);
   }
 
-  // あなたが作った最高のプロンプトをそのままAIにぶち込む関数
   async function generateMenuPlan(screenshotInfo) {
     const stock = document.getElementById("stockIngredients").value || "特になし";
     const priority = document.getElementById("priorityIngredients").value || "特になし";
@@ -266,7 +274,6 @@
     const budget = document.getElementById("budgetLimit").value;
     const resultArea = document.getElementById("resultArea");
 
-    // あなたから提示されたプロンプトテンプレートを忠実に反映
     const mainPrompt = `あなたは優秀な献立プランナー「じぇみちゃん」です。
 以下の条件をもとに、**大人2人分・平日5日分の夕食献立**を作成してください。
  
@@ -399,11 +406,10 @@ ${always}
 ## 注意点
 - 買い足し予算内を意識してください。  
 - ただし、味噌・醤油・砂糖・塩・こしょう・油などの基本調味料が常備に含まれていない場合は、必要に応じて「家にあれば買い足し不要」と補足してください。  
-- 魚を増やす場合でも、予算を超えやすい場合は「さば缶」「特売の鮭」「冷凍白身魚」など節約案を提示してください。
+- 魚を増やす場合でも、予算超えやすい場合は「さば缶」「特売の鮭」「冷凍白身魚」など節約案を提示してください。
 - 主菜が豚こまに偏らないようにしてください。  
 - 炒め物が多くなりすぎないようにしてください。`;
 
-    // 献立をがっつり長文で出力させるため、少し賢いモデル（gemini-1.5-pro）を使用します
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${GEMINI_API_KEY}`;
     
     const response = await fetch(url, {
@@ -413,12 +419,20 @@ ${always}
     });
 
     const json = await response.json();
+    if (!json.candidates || json.candidates.length === 0) {
+      throw new Error("じぇみちゃんからの応答がありませんでした。APIキーやプロンプトを確認してください。");
+    }
+
     let resultText = json.candidates[0].content.parts[0].text;
 
-    // AIが返してきたマークダウンのチェックボックスをHTMLで動くチェックボックスに簡易置換して利便性UP
-    resultText = resultText.replace(/- \[ \]/g, "▢");
+    // 【利便性UP】マークダウンを簡易的なHTMLタグに変換して見栄えを良くする
+    resultText = resultText
+      .replace(/- \[ \]/g, "▢") // 元のチェックボックス置換
+      .replace(/## (.*)/g, '<h3>$1</h3>') // 見出し2
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // 太字
+      .replace(/\n/g, '<br>'); // 改行
 
-    resultArea.innerText = resultText;
+    resultArea.innerHTML = resultText; // innerTextからinnerHTMLに変更
     resultArea.style.display = "block";
   }
 </script>
