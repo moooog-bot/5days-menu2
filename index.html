@@ -20,50 +20,81 @@
     }
 
     .container {
-      max-width: 800px;
+      max-width: 750px;
       margin: 0 auto;
-      text-align: center;
+      text-align: left; /* 入力項目が多いため左寄せで見やすく */
     }
 
     h1 {
-      font-size: 26px;
-      margin-bottom: 10px;
+      font-size: 24px;
+      margin-bottom: 5px;
       letter-spacing: 1px;
+      text-align: center;
     }
 
     .subtitle {
-      font-size: 14px;
+      font-size: 13px;
       color: #777777;
-      margin-bottom: 40px;
+      margin-bottom: 35px;
+      text-align: center;
     }
 
-    .search-box {
-      margin-bottom: 40px;
+    /* 入力フォームのエリア */
+    .form-section {
       background-color: #fafafa;
-      padding: 30px;
+      padding: 25px 30px;
       border-radius: 8px;
       border: 1px solid #eeeeee;
+      margin-bottom: 30px;
     }
 
-    .search-box p {
-      margin-top: 0;
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-group label {
+      display: block;
       font-size: 14px;
-      color: #555555;
+      font-weight: bold;
+      margin-bottom: 6px;
+      color: #444444;
     }
 
-    input[type="text"] {
-      padding: 12px 15px;
-      font-size: 16px;
+    input[type="text"], textarea, select {
+      width: 100%;
+      padding: 10px 12px;
+      font-size: 15px;
       border: 1px solid #ccc;
       border-radius: 4px;
-      width: 280px;
-      max-width: 100%;
-      margin-bottom: 15px;
       box-sizing: border-box;
+      font-family: inherit;
+    }
+
+    textarea {
+      height: 60px;
+      resize: vertical;
+    }
+
+    /* スクショ選択エリア */
+    .screenshot-zone {
+      border: 1px dashed #cccccc;
+      background-color: #ffffff;
+      padding: 15px;
+      border-radius: 4px;
+      margin-top: 10px;
+    }
+
+    .screenshot-zone input {
+      margin-top: 5px;
+    }
+
+    .btn-container {
+      text-align: center;
+      margin-top: 25px;
     }
 
     button {
-      padding: 12px 30px;
+      padding: 14px 40px;
       font-size: 16px;
       background-color: #333333;
       color: #ffffff;
@@ -71,131 +102,35 @@
       border-radius: 4px;
       cursor: pointer;
       transition: background-color 0.2s;
-      width: 280px;
-      max-width: 100%;
+      width: 100%;
+      max-width: 320px;
+      font-weight: bold;
     }
 
     button:hover {
       background-color: #555555;
     }
 
-    /* ヒント・リンクエリア */
-    .recipe-links {
-      display: none; /* 最初は非表示 */
-      background-color: #fff9f9;
-      border: 1px solid #f5d6d6;
-      border-radius: 6px;
-      padding: 20px;
-      margin-bottom: 30px;
-      text-align: left;
-    }
-
-    .recipe-links p {
-      margin-top: 0;
+    /* ローディング */
+    .loading {
+      display: none;
       font-size: 14px;
-      font-weight: bold;
-      color: #d9534f;
+      color: #666;
+      margin-top: 15px;
+      text-align: center;
     }
 
-    .link-group {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 15px;
-      margin-top: 10px;
-    }
-
-    .recipe-links a {
-      color: #333333;
-      font-size: 13px;
-      text-decoration: underline;
-    }
-
-    .recipe-links a:hover {
-      color: #777777;
-    }
-
+    /* AI出力結果表示エリア */
     .result-section {
       display: none;
-      text-align: left;
-    }
-
-    h2 {
-      font-size: 20px;
-      border-left: 4px solid #333333;
-      padding-left: 10px;
-      margin-top: 40px;
-      margin-bottom: 20px;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 15px;
-    }
-
-    .day-card {
-      border: 1px solid #e0e0e0;
-      border-radius: 6px;
-      padding: 15px;
       background-color: #ffffff;
-    }
-
-    .day-title {
-      font-weight: bold;
-      font-size: 16px;
-      text-align: center;
-      border-bottom: 2px solid #333333;
-      padding-bottom: 5px;
-      margin-bottom: 15px;
-    }
-
-    .menu-item {
-      margin-bottom: 12px;
-      font-size: 13px;
-    }
-
-    .label {
-      font-size: 10px;
-      color: #888888;
-      display: block;
-      margin-bottom: 2px;
-    }
-
-    .highlight {
-      color: #d9534f;
-      font-weight: bold;
-    }
-
-    .shopping-list {
-      background-color: #fafafa;
-      border: 1px solid #eeeeee;
+      border: 1px solid #e0e0e0;
       border-radius: 8px;
-      padding: 20px 30px;
-    }
-
-    .shopping-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 20px;
-    }
-
-    .shopping-category h3 {
-      font-size: 14px;
-      margin-top: 0;
-      margin-bottom: 10px;
-      color: #555555;
-      border-bottom: 1px solid #ddd;
-      padding-bottom: 3px;
-    }
-
-    .shopping-category ul {
-      margin: 0;
-      padding-left: 20px;
-      font-size: 13px;
-    }
-
-    .shopping-category li {
-      margin-bottom: 5px;
+      padding: 30px;
+      margin-top: 20px;
+      white-space: pre-wrap; /* AIが返した改行をそのまま綺麗に表示 */
+      font-size: 15px;
+      line-height: 1.7;
     }
   </style>
 </head>
@@ -203,213 +138,288 @@
 
 <div class="container">
   <h1>平日5日間の献立作成</h1>
-  <div class="subtitle">買い出しを楽にするメニュー・ショッピングリスト</div>
+  <div class="subtitle">AIプランナー（じぇみちゃん）があなたに最適な献立を提案します</div>
 
-  <div class="search-box">
-    <p>今週使いたいメイン食材を入力してください</p>
-    <input type="text" id="mainIngredient" placeholder="例：豚、鶏、鮭（空欄でもOK）"><br>
-    <button onclick="generateWeeklyMenu()">献立と買い物リストを作る</button>
-  </div>
+  <div class="form-section">
+    <div class="form-group">
+      <label>【冷蔵庫・冷凍庫・食品庫にある食材】</label>
+      <textarea id="stockIngredients" placeholder="例：キャベツ1/2玉、玉ねぎ2個、鶏もも肉2枚、冷凍うどん"></textarea>
+    </div>
 
-  <div id="linkArea" class="recipe-links">
-    <p>⚠️ 入力された食材の登録メニューがありませんでした。こちらのレシピを参考にしてみてください：</p>
-    <div class="link-group">
-      <a href="https://x.com/syunkon0507?s=21&t=LhhaYyuplJrRdYaZroCQVg" target="_blank" rel="noopener">山本ゆりさん (X)</a>
-      <a href="https://x.com/akari_hasegawa?s=21&t=LhhaYyuplJrRdYaZroCQVg" target="_blank" rel="noopener">長谷川あかりさん (X)</a>
-      <a href="https://cookpad.com/jp" target="_blank" rel="noopener">クックパッド</a>
+    <div class="form-group">
+      <label>【優先的に消費したい食材】※傷みやすいものなど</label>
+      <input type="text" id="priorityIngredients" placeholder="例：ひき肉（今日まで）、もやし">
+    </div>
+
+    <div class="form-group">
+      <label>【常備食材】※基本固定、買い足し不要として計算</label>
+      <textarea id="alwaysIngredients">卵、豆腐、納豆、牛乳、基本調味料（味噌・醤油・砂糖・塩・こしょう・油・マヨネーズ・ケチャップ・コンソメ・中華スープの素）</textarea>
+    </div>
+
+    <div class="form-group">
+      <label>【買い足し予算】</label>
+      <select id="budgetLimit">
+        <option value="上限なし">上限なし</option>
+        <option value="1500円">1500円</option>
+        <option value="1000円">1000円</option>
+        <option value="500円">500円</option>
+        <option value="なし">なし（買い足さない）</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <div class="screenshot-zone">
+        <label style="margin:0; color:#444;">【お気に入りインスタスクショ】※あれば選択</label>
+        <input type="file" id="screenshotInput" accept="image/*">
+      </div>
+    </div>
+
+    <div class="btn-container">
+      <button onclick="startAiPlanner()">献立をじぇみちゃんに考えてもらう</button>
+      <div id="loadingText" class="loading">⏳ じぇみちゃんが献立プランを一生懸命作成中...<br>（AIが思考するため10秒ほどかかります）</div>
     </div>
   </div>
 
-  <div id="resultArea" class="result-section">
-    <h2>5日間の献立</h2>
-    <div class="grid" id="weeklyMenu"></div>
-
-    <h2>買い物一覧（5日分）</h2>
-    <div class="shopping-list" id="shoppingList"></div>
-  </div>
+  <div id="resultArea" class="result-section"></div>
 </div>
 
 <script>
-  const recipeDatabase = {
-    main: [
-      { name: "豚肉の生姜焼き", keywords: ["豚", "豚肉"], ingredients: ["豚薄切り肉", "玉ねぎ", "生姜"] },
-      { name: "豚キムチ炒め", keywords: ["豚", "豚肉"], ingredients: ["豚バラ肉", "キムチ", "ニラ"] },
-      { name: "とんかつ", keywords: ["豚", "豚肉"], ingredients: ["豚ロース肉", "キャベツ", "卵", "パン粉"] },
-      { name: "鶏の唐揚げ", keywords: ["鶏", "鶏肉", "とり"], ingredients: ["鶏もも肉", "レモン"] },
-      { name: "親子丼の具", keywords: ["鶏", "鶏肉", "とり", "卵"], ingredients: ["鶏むね肉", "玉ねぎ", "卵", "三つ葉"] },
-      { name: "チキン南蛮", keywords: ["鶏", "鶏肉", "とり"], ingredients: ["鶏もも肉", "卵", "玉ねぎ", "タルタルソース"] },
-      { name: "牛丼の具", keywords: ["牛", "牛肉"], ingredients: ["牛薄切り肉", "玉ねぎ", "紅生姜"] },
-      { name: "青椒肉絲", keywords: ["牛", "牛肉", "豚", "豚肉"], ingredients: ["豚肉または牛肉", "ピーマン", "たけのこ水煮"] },
-      { name: "ハンバーグ", keywords: ["牛", "豚", "ひき肉"], ingredients: ["合挽き肉", "玉ねぎ", "卵", "パン粉"] },
-      { name: "鮭の塩焼き", keywords: ["鮭", "シャケ", "魚"], ingredients: ["鮭の切り身", "大根（大根おろし用）"] },
-      { name: "サバの味噌煮", keywords: ["鯖", "サバ", "魚"], ingredients: ["サバの切り身", "生姜"] },
-      { name: "タラのムニエル", keywords: ["タラ", "白身魚", "魚"], ingredients: ["タラの切り身", "レモン", "バター"] },
-      { name: "麻婆豆腐", keywords: ["豚", "ひき肉", "豆腐"], ingredients: ["豚ひき肉", "豆腐", "長ネギ"] },
-      { name: "肉じゃが", keywords: ["牛", "豚", "じゃがいも"], ingredients: ["豚肉または牛肉", "じゃがいも", "人参", "玉ねぎ", "しらたき"] }
-    ],
-    sub: [
-      { name: "ほうれん草のお浸し", ingredients: ["ほうれん草", "かつお節"] },
-      { name: "きんぴらごぼう", ingredients: ["ごぼう", "人参", "ごま"] },
-      { name: "ひじきの煮物", ingredients: ["ひじき", "人参", "油揚げ"] },
-      { name: "茄子の煮浸し", ingredients: ["茄子", "生姜"] },
-      { name: "かぼちゃの煮物", ingredients: ["かぼちゃ"] },
-      { name: "出し巻き卵", ingredients: ["卵"] },
-      { name: "ピーマンの塩昆布炒め", ingredients: ["ピーマン", "塩昆布"] },
-      { name: "小松菜の胡麻和え", ingredients: ["小松菜", "すりごま"] }
-    ],
-    salad: [
-      { name: "ポテトサラダ", ingredients: ["じゃがいも", "きゅうり", "ハム", "マヨネーズ"] },
-      { name: "キャベツとツナのサラダ", ingredients: ["キャベツ", "ツナ缶"] },
-      { name: "トマトと豆腐のサラダ", ingredients: ["トマト", "豆腐", "ドレッシング"] },
-      { name: "レタスとチョレギサラダ", ingredients: ["レタス", "韓国のり", "ごま"] },
-      { name: "大根とジャコのサラダ", ingredients: ["大根", "じゃこ"] }
-    ],
-    soup: [
-      { name: "豆腐とわかめのお味噌汁", ingredients: ["豆腐", "わかめ", "味噌"] },
-      { name: "お揚げと大根のお味噌汁", ingredients: ["油揚げ", "大根", "味噌"] },
-      { name: "豚汁", ingredients: ["豚バラ肉", "大根", "人参", "ごぼう", "味噌"] },
-      { name: "卵とわかめの中華スープ", ingredients: ["卵", "わかめ", "中華スープの素"] },
-      { name: "キャベツのコンソメスープ", ingredients: ["キャベツ", "玉ねぎ", "コンソメ"] }
-    ]
+  // 🔑 取得したAPIキーを下のシングルクォーテーションの中に貼り付けてください
+  const GEMINI_API_KEY = 'AQ.Ab8RN6KnMC1xtFywzpVBySJ9N56UTEEsPQbbK34AG7mBDoY1jA';
+
+  // 画面ロード時に、前回の常備食材や手持ち食材を自動で復元（LocalStorage機能）
+  window.onload = function() {
+    if(localStorage.getItem('stock_ing')) document.getElementById('stockIngredients').value = localStorage.getItem('stock_ing');
+    if(localStorage.getItem('prior_ing')) document.getElementById('priorityIngredients').value = localStorage.getItem('prior_ing');
+    if(localStorage.getItem('always_ing')) document.getElementById('alwaysIngredients').value = localStorage.getItem('always_ing');
+    if(localStorage.getItem('budget_lim')) document.getElementById('budgetLimit').value = localStorage.getItem('budget_lim');
   };
 
-  const days = ["月曜日", "火曜日", "水曜日", "木曜日", "金曜日"];
+  async function startAiPlanner() {
+    const fileInput = document.getElementById("screenshotInput");
+    const loadingText = document.getElementById("loadingText");
+    const resultArea = document.getElementById("resultArea");
+    
+    // 入力値を保存しておく（次回開いたときに入力し直す手間を省くため）
+    localStorage.setItem('stock_ing', document.getElementById('stockIngredients').value);
+    localStorage.setItem('prior_ing', document.getElementById('priorityIngredients').value);
+    localStorage.setItem('always_ing', document.getElementById('alwaysIngredients').value);
+    localStorage.setItem('budget_lim', document.getElementById('budgetLimit').value);
 
-  function shuffleArray(array) {
-    return array.sort(() => Math.random() - 0.5);
+    loadingText.style.display = "block";
+    resultArea.style.display = "none";
+
+    let screenshotText = "なし";
+
+    // もしスクショがあれば、まずスクショから料理名と食材を読み取る
+    if (fileInput.files.length > 0) {
+      try {
+        const aiParsed = await analyzeScreenshot(fileInput.files[0]);
+        screenshotText = `料理名: ${aiParsed.name}, 必要な食材: ${aiParsed.ingredients.join(', ')}`;
+      } catch (error) {
+        console.error("スクショ解析エラー:", error);
+        screenshotText = "（画像の読み込みに一部失敗したため、定番のアイデアから補正してください）";
+      }
+    }
+
+    // 本番の献立作成プロンプトを組み立てて送信
+    try {
+      await generateMenuPlan(screenshotText);
+    } catch (error) {
+      alert("通信エラーが発生しました。もう一度試してみてください。");
+      console.error(error);
+    }
+
+    loadingText.style.display = "none";
   }
 
-  function generateConsecutiveList(databaseList) {
-    let result = [];
-    let lastItem = null;
-    let consecutiveCount = 0;
-
-    for (let i = 0; i < 5; i++) {
-      let availableItems = [...databaseList];
-      if (consecutiveCount >= 2) {
-        availableItems = availableItems.filter(item => item.name !== lastItem.name);
-      }
-      const selected = availableItems[Math.floor(Math.random() * availableItems.length)];
-      if (lastItem && selected.name === lastItem.name) {
-        consecutiveCount++;
-      } else {
-        consecutiveCount = 1;
-      }
-      result.push(selected);
-      lastItem = selected;
-    }
-    return result;
-  }
-
-  function generateWeeklyMenu() {
-    const keyword = document.getElementById("mainIngredient").value.trim();
-    const menuContainer = document.getElementById("weeklyMenu");
-    const shoppingContainer = document.getElementById("shoppingList");
-    const linkArea = document.getElementById("linkArea");
-    
-    menuContainer.innerHTML = "";
-    shoppingContainer.innerHTML = "";
-    linkArea.style.display = "none"; 
-
-    // 1. 指定食材の抽出
-    let matchedMains = [];
-    if (keyword) {
-      matchedMains = recipeDatabase.main.filter(item => 
-        item.name.includes(keyword) || item.keywords.some(k => k.includes(keyword))
-      );
-    }
-
-    // 💡 修正ポイント: 登録メニューがない（0件）ならリンクエリアを即表示、救済メニューは作らない
-    let isIngredientMissing = false;
-    if (keyword && matchedMains.length === 0) {
-      linkArea.style.display = "block";
-      isIngredientMissing = true;
-    }
-
-    // 2. 主菜の選定（5日間重複なし）
-    let selectedMains = [];
-    
-    // 食材が見つかった場合だけ、2〜3回使う日を抽選する
-    let targetCount = 0;
-    if (keyword && !isIngredientMissing) {
-      targetCount = Math.floor(Math.random() * 2) + 2; // 2回か3回
-    }
-    
-    const dayIndices = [0, 1, 2, 3, 4];
-    shuffleArray(dayIndices);
-    const guaranteedDays = dayIndices.slice(0, targetCount);
-
-    let shuffledAllMains = shuffleArray([...recipeDatabase.main]);
-    let shuffledMatchedMains = shuffleArray([...matchedMains]);
-
-    for (let i = 0; i < 5; i++) {
-      let chosen;
-      // 食材がヒットしていて、かつその指定日の場合
-      if (!isIngredientMissing && guaranteedDays.includes(i)) {
-        chosen = shuffledMatchedMains.pop();
-        if (!chosen) chosen = shuffledAllMains.pop(); 
-      } else {
-         // 食材がヒットしなかった、あるいは指定日以外は全体から重複なしで選ぶ
-        chosen = shuffledAllMains.find(item => !matchedMains.some(m => m.name === item.name));
-        if (!chosen) chosen = shuffledAllMains.pop();
-        shuffledAllMains = shuffledAllMains.filter(item => item.name !== chosen.name);
-      }
-      selectedMains[i] = chosen;
-    }
-
-    // 3. 副菜・サラダ・汁物の選定（2日連続まで重複OKルール）
-    const selectedSubs = generateConsecutiveList(recipeDatabase.sub);
-    const selectedSoups = generateConsecutiveList(recipeDatabase.soup);
-    const selectedSalads = generateConsecutiveList(recipeDatabase.salad);
-
-    let allIngredients = [];
-
-    // 4. 画面への出力
-    for (let i = 0; i < 5; i++) {
-      const mainItem = selectedMains[i];
-      const subItem = selectedSubs[i];
-      const saladItem = selectedSalads[i];
-      const soupItem = selectedSoups[i];
-
-      allIngredients.push(...mainItem.ingredients, ...subItem.ingredients, ...saladItem.ingredients, ...soupItem.ingredients);
-
-      // 入力されたキーワードが含まれる場合のみハイライト
-      const isHighlighted = keyword && mainItem.name.includes(keyword) ? "highlight" : "";
-
-      const card = document.createElement("div");
-      card.className = "day-card";
-      card.innerHTML = `
-        <div class="day-title">${days[i]}</div>
-        <div class="menu-item"><span class="label">主菜</span><span class="${isHighlighted}">${mainItem.name}</span></div>
-        <div class="menu-item"><span class="label">副菜</span>${subItem.name}</div>
-        <div class="menu-item"><span class="label">サラダ</span>${saladItem.name}</div>
-        <div class="menu-item"><span class="label">汁物</span>${soupItem.name}</div>
-      `;
-      menuContainer.appendChild(card);
-    }
-
-    // 5. 買い物リストの出力
-    const uniqueIngredients = [...new Set(allIngredients)];
-    const shoppingHTML = `
-      <div class="shopping-grid">
-        <div class="shopping-category">
-          <h3>必要な食材（まとめ）</h3>
-          <ul>
-            ${uniqueIngredients.map(ing => `<li><label><input type="checkbox"> ${ing}</label></li>`).join('')}
-          </ul>
-        </div>
-      </div>
-    `;
-    shoppingContainer.innerHTML = shoppingHTML;
-    document.getElementById("resultArea").style.display = "block";
-  }
-
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js')
-        .then(reg => console.log('Service Worker 登録成功:', reg.scope))
-        .catch(err => console.log('Service Worker 登録失敗:', err));
+  // スクショ画像を1つめのAI（Gemini Flash）に投げて文字起こしする関数
+  async function analyzeScreenshot(file) {
+    const base64Data = await new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result.split(',')[1]);
+      reader.readAsDataURL(file);
     });
+
+    const prompt = `画像から、料理名と必要な具体的な食材（肉や野菜などのメイン固形物のみ）を抜き出し、以下のJSON形式でのみ返してください。
+{"name": "料理名", "ingredients": ["食材1", "食材2"]} `;
+
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }, { inlineData: { mimeType: file.type, data: base64Data } }] }]
+      })
+    });
+
+    const json = await response.json();
+    const responseText = json.candidates[0].content.parts[0].text.trim();
+    return JSON.parse(responseText.replace(/```json|```/g, ""));
+  }
+
+  // あなたが作った最高のプロンプトをそのままAIにぶち込む関数
+  async function generateMenuPlan(screenshotInfo) {
+    const stock = document.getElementById("stockIngredients").value || "特になし";
+    const priority = document.getElementById("priorityIngredients").value || "特になし";
+    const always = document.getElementById("alwaysIngredients").value || "特になし";
+    const budget = document.getElementById("budgetLimit").value;
+    const resultArea = document.getElementById("resultArea");
+
+    // あなたから提示されたプロンプトテンプレートを忠実に反映
+    const mainPrompt = `あなたは優秀な献立プランナー「じぇみちゃん」です。
+以下の条件をもとに、**大人2人分・平日5日分の夕食献立**を作成してください。
+ 
+## 基本条件
+【作成日数】5日分
+【対象曜日】平日のみ（月〜金）
+【必要な食事】夕食のみ
+【1食あたりの品数】主菜1品、副菜1品、サラダ1品、汁物1品
+【家族構成】大人2人
+ 
+## 重視ポイント
+- 作り置きを活用する
+- お弁当に使い回せるおかずを含める
+- 平日は30分以内で作れる献立を優先する
+- 洗い物が多すぎないようにする
+- 栄養バランスを考慮する
+ 
+## 調理傾向
+- 揚げ物は少なめ（月1位は可能）
+- 炒め物に偏らない
+- 煮る・焼く・蒸す・レンジ調理をバランスよく使う
+- 和食・洋食・中華を5日間でバランスよく組み合わせる
+- 作り置き考慮
+- 使い切りを目標に
+- STAN自動調理鍋有り。煮物系はこちらを使用可能
+- 山本ゆり、長谷川あかりのレシピが好み
+ 
+## 手持ち食材
+【冷蔵庫・冷凍庫・食品庫にある食材】
+${stock}
+ 
+【優先的に消費したい食材】
+${priority}
+※傷みやすいため、できるだけ早い日程で使用すること。
+ 
+【常備食材】
+${always}
+※常備食材は買い足し不要として扱うこと。
+
+【★追加の限定バズレシピ条件】
+ユーザーが作りたいと思っているインスタのスクショレシピ情報： ${screenshotInfo}
+※もし「なし」以外であれば、このレシピを5日間のどこか1日の主菜または副菜に必ず組み込み、必要な食材も買い足し計算に含めてください。
+ 
+## 買い足し条件
+【買い足し予算】 ${budget} を意識すること。
+【買い足し方針】
+- 魚を献立に取り入れること
+- 豚こま主菜に偏らないこと
+- 買い足しは必要最低限にすること
+- 高価な食材や特殊な調味料は避けること
+- 魚は鮭、白身魚、さば缶など、安価で扱いやすいものを優先すること
+ 
+## 献立作成ルール
+1. 同じ主菜を繰り返さない  
+2. 主菜が豚こまばかりにならないようにする
+3. 同じ調理法が連続しすぎないようにする  
+4. 炒め物が多くなりすぎないようにする  
+5. 食材をできるだけ使い切る  
+6. 優先食材は早い日程で使用する  
+7. 作り置きや汁物の使い回しを提案する  
+8. お弁当に転用しやすいおかずを含める  
+9. 栄養バランスを考慮する  
+10. 現実的に家庭で作れる献立にする  
+11. 特殊な調味料や高価な食材は極力避ける  
+12. 毎日揚げ物にしない  
+13. 洗い物が多すぎる献立は避ける  
+ 
+## 出力形式
+必ず以下の形式を完全に守って出力してください。見出しの記号なども統一してください。
+ 
+■1日目（月）ジャンル：和食／洋食／中華など  
+主菜：  
+副菜：  
+サラダ：  
+汁物：  
+使用食材：  
+追加購入食材：  
+調理のポイント：  
+お弁当への使い回し：
+ 
+■2日目（火）ジャンル：  
+主菜：  
+副菜：  
+サラダ：  
+汁物：  
+使用食材：  
+追加購入食材：  
+調理のポイント：  
+お弁当への使い回し：
+ 
+■3日目（水）ジャンル：  
+主菜：  
+副菜：  
+サラダ：  
+汁物：  
+使用食材：  
+追加購入食材：  
+調理のポイント：  
+お弁当への使い回し：
+ 
+■4日目（木）ジャンル：  
+主菜：  
+副菜：  
+サラダ：  
+汁物：  
+使用食材：  
+追加購入食材：  
+調理のポイント：  
+お弁当への使い回し：
+ 
+■5日目（金）ジャンル：  
+主菜：  
+副菜：  
+サラダ：  
+汁物：  
+使用食材：  
+追加購入食材：  
+調理のポイント：  
+お弁当への使い回し：
+ 
+## 最後に必ず出力する内容
+1. 期間全体で使用する食材一覧  
+2. 買い足しが必要な食材一覧（チェックボックス形式「- [ ] 食材名」で出力してください）
+3. 概算予算  
+4. 食材の使い切り状況  
+5. 作り置き・使い回しポイント  
+6. 5日間のジャンルバランス  
+7. 調理法のバランス  
+ 
+## 注意点
+- 買い足し予算内を意識してください。  
+- ただし、味噌・醤油・砂糖・塩・こしょう・油などの基本調味料が常備に含まれていない場合は、必要に応じて「家にあれば買い足し不要」と補足してください。  
+- 魚を増やす場合でも、予算を超えやすい場合は「さば缶」「特売の鮭」「冷凍白身魚」など節約案を提示してください。
+- 主菜が豚こまに偏らないようにしてください。  
+- 炒め物が多くなりすぎないようにしてください。`;
+
+    // 献立をがっつり長文で出力させるため、少し賢いモデル（gemini-1.5-pro）を使用します
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${GEMINI_API_KEY}`;
+    
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contents: [{ parts: [{ text: mainPrompt }] }] })
+    });
+
+    const json = await response.json();
+    let resultText = json.candidates[0].content.parts[0].text;
+
+    // AIが返してきたマークダウンのチェックボックスをHTMLで動くチェックボックスに簡易置換して利便性UP
+    resultText = resultText.replace(/- \[ \]/g, "▢");
+
+    resultArea.innerText = resultText;
+    resultArea.style.display = "block";
   }
 </script>
 
