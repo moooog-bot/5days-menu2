@@ -101,6 +101,7 @@
       display: flex;
       flex-wrap: wrap;
       gap: 15px;
+      margin-top: 10px;
     }
 
     .recipe-links a {
@@ -211,7 +212,7 @@
   </div>
 
   <div id="linkArea" class="recipe-links">
-    <p>⚠️ 入力された食材の登録メニューが少ないか、ありませんでした。こちらのレシピも参考にしてみてください：</p>
+    <p>⚠️ 入力された食材の登録メニューがありませんでした。こちらのレシピを参考にしてみてください：</p>
     <div class="link-group">
       <a href="https://x.com/syunkon0507?s=21&t=LhhaYyuplJrRdYaZroCQVg" target="_blank" rel="noopener">山本ゆりさん (X)</a>
       <a href="https://x.com/akari_hasegawa?s=21&t=LhhaYyuplJrRdYaZroCQVg" target="_blank" rel="noopener">長谷川あかりさん (X)</a>
@@ -278,29 +279,22 @@
     return array.sort(() => Math.random() - 0.5);
   }
 
-  // ルールに沿って「連続2日まで」の条件を満たす配列を1カテゴリ分生成する関数
   function generateConsecutiveList(databaseList) {
     let result = [];
     let lastItem = null;
     let consecutiveCount = 0;
 
     for (let i = 0; i < 5; i++) {
-      // 直前と同じものを連続して良い（ただし2日間まで）かつ、完全ランダム
       let availableItems = [...databaseList];
-      
-      // もしすでに2連続しているなら、そのアイテムは選べないように除外
       if (consecutiveCount >= 2) {
         availableItems = availableItems.filter(item => item.name !== lastItem.name);
       }
-
       const selected = availableItems[Math.floor(Math.random() * availableItems.length)];
-      
       if (lastItem && selected.name === lastItem.name) {
         consecutiveCount++;
       } else {
         consecutiveCount = 1;
       }
-      
       result.push(selected);
       lastItem = selected;
     }
@@ -315,7 +309,7 @@
     
     menuContainer.innerHTML = "";
     shoppingContainer.innerHTML = "";
-    linkArea.style.display = "none"; // 初期化
+    linkArea.style.display = "none"; 
 
     // 1. 指定食材の抽出
     let matchedMains = [];
@@ -325,48 +319,47 @@
       );
     }
 
-    // 💡 新機能: もしヒットしなかった、または登録数が少なすぎる場合は外部リンクを表示
-    // 5日間のうち2〜3回使うため、マッチした料理が2つ未満の場合にリンクを出す仕様にしています
-    if (keyword && matchedMains.length < 2) {
+    // 💡 修正ポイント: 登録メニューがない（0件）ならリンクエリアを即表示、救済メニューは作らない
+    let isIngredientMissing = false;
+    if (keyword && matchedMains.length === 0) {
       linkArea.style.display = "block";
+      isIngredientMissing = true;
     }
-    
 
-    // 2. 主菜の選定（5日間で重複なし）
+    // 2. 主菜の選定（5日間重複なし）
     let selectedMains = [];
-    const targetCount = keyword ? Math.floor(Math.random() * 2) + 2 : 0; // 指定食材を使う日数（2か3）
+    
+    // 食材が見つかった場合だけ、2〜3回使う日を抽選する
+    let targetCount = 0;
+    if (keyword && !isIngredientMissing) {
+      targetCount = Math.floor(Math.random() * 2) + 2; // 2回か3回
+    }
     
     const dayIndices = [0, 1, 2, 3, 4];
     shuffleArray(dayIndices);
     const guaranteedDays = dayIndices.slice(0, targetCount);
-      // シャッフルした全体リストを作っておく
+
     let shuffledAllMains = shuffleArray([...recipeDatabase.main]);
     let shuffledMatchedMains = shuffleArray([...matchedMains]);
 
     for (let i = 0; i < 5; i++) {
       let chosen;
-      if (guaranteedDays.includes(i)) {
-        // 指定食材を使う日
+      // 食材がヒットしていて、かつその指定日の場合
+      if (!isIngredientMissing && guaranteedDays.includes(i)) {
         chosen = shuffledMatchedMains.pop();
-        // 万が一、指定食材のバリエーションが尽きたら全体から補充
         if (!chosen) chosen = shuffledAllMains.pop(); 
       } else {
-        // 指定食材を使わない日（他の主菜と被らないように選ぶ）
-        // 指定食材リストに含まれていないもので、かつ、まだ使っていないものを探す
+         // 食材がヒットしなかった、あるいは指定日以外は全体から重複なしで選ぶ
         chosen = shuffledAllMains.find(item => !matchedMains.some(m => m.name === item.name));
-        // 条件に合うものがなければ、まだ使っていない主菜から選ぶ
         if (!chosen) chosen = shuffledAllMains.pop();
-        // 使用済みとしてシャッフル全体リストから除外
         shuffledAllMains = shuffledAllMains.filter(item => item.name !== chosen.name);
       }
       selectedMains[i] = chosen;
     }
 
-    // 3. 副菜・サラダ・汁物の選定（副菜と汁物は2日間連続まで重複OKルールを適用）
+    // 3. 副菜・サラダ・汁物の選定（2日連続まで重複OKルール）
     const selectedSubs = generateConsecutiveList(recipeDatabase.sub);
     const selectedSoups = generateConsecutiveList(recipeDatabase.soup);
-    
-    // サラダは特に連続ルールの指定がありませんが、せっかくなので同じ連続2日ルールを適用させておきます
     const selectedSalads = generateConsecutiveList(recipeDatabase.salad);
 
     let allIngredients = [];
@@ -380,6 +373,7 @@
 
       allIngredients.push(...mainItem.ingredients, ...subItem.ingredients, ...saladItem.ingredients, ...soupItem.ingredients);
 
+      // 入力されたキーワードが含まれる場合のみハイライト
       const isHighlighted = keyword && mainItem.name.includes(keyword) ? "highlight" : "";
 
       const card = document.createElement("div");
