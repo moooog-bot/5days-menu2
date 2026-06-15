@@ -329,14 +329,8 @@
     // 5日間のうち2〜3回使うため、マッチした料理が2つ未満の場合にリンクを出す仕様にしています
     if (keyword && matchedMains.length < 2) {
       linkArea.style.display = "block";
-      // データベース上に全く料理がない場合、その場で仮のメニューを作成して救済
-      if (matchedMains.length === 0) {
-        matchedMains.push(
-          { name: `${keyword}の創作メイン①`, ingredients: [`${keyword}（メイン食材）`] },
-          { name: `${keyword}の創作メイン②`, ingredients: [`${keyword}（メイン食材）`] }
-        );
-      }
     }
+    
 
     // 2. 主菜の選定（5日間で重複なし）
     let selectedMains = [];
