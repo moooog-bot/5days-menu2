@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>5日間の献立ジェネレーター</title>
-  <link rel="link" href="manifest.json" rel="manifest">
+  <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon-192.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -37,7 +37,6 @@
       margin-bottom: 40px;
     }
 
-    /* 入力フォーム */
     .search-box {
       margin-bottom: 40px;
       background-color: #fafafa;
@@ -80,7 +79,40 @@
       background-color: #555555;
     }
 
-    /* 結果エリア（最初は非表示） */
+    /* ヒント・リンクエリア */
+    .recipe-links {
+      display: none; /* 最初は非表示 */
+      background-color: #fff9f9;
+      border: 1px solid #f5d6d6;
+      border-radius: 6px;
+      padding: 20px;
+      margin-bottom: 30px;
+      text-align: left;
+    }
+
+    .recipe-links p {
+      margin-top: 0;
+      font-size: 14px;
+      font-weight: bold;
+      color: #d9534f;
+    }
+
+    .link-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .recipe-links a {
+      color: #333333;
+      font-size: 13px;
+      text-decoration: underline;
+    }
+
+    .recipe-links a:hover {
+      color: #777777;
+    }
+
     .result-section {
       display: none;
       text-align: left;
@@ -94,7 +126,6 @@
       margin-bottom: 20px;
     }
 
-    /* 5日間のグリッド */
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -134,7 +165,6 @@
       font-weight: bold;
     }
 
-    /* 買い物リスト */
     .shopping-list {
       background-color: #fafafa;
       border: 1px solid #eeeeee;
@@ -180,6 +210,15 @@
     <button onclick="generateWeeklyMenu()">献立と買い物リストを作る</button>
   </div>
 
+  <div id="linkArea" class="recipe-links">
+    <p>⚠️ 入力された食材の登録メニューが少ないか、ありませんでした。こちらのレシピも参考にしてみてください：</p>
+    <div class="link-group">
+      <a href="https://x.com/syunkon0507?s=21&t=LhhaYyuplJrRdYaZroCQVg" target="_blank" rel="noopener">山本ゆりさん (X)</a>
+      <a href="https://x.com/akari_hasegawa?s=21&t=LhhaYyuplJrRdYaZroCQVg" target="_blank" rel="noopener">長谷川あかりさん (X)</a>
+      <a href="https://cookpad.com/jp" target="_blank" rel="noopener">クックパッド</a>
+    </div>
+  </div>
+
   <div id="resultArea" class="result-section">
     <h2>5日間の献立</h2>
     <div class="grid" id="weeklyMenu"></div>
@@ -190,7 +229,6 @@
 </div>
 
 <script>
-  // --- 料理データベースと必要な食材リスト ---
   const recipeDatabase = {
     main: [
       { name: "豚肉の生姜焼き", keywords: ["豚", "豚肉"], ingredients: ["豚薄切り肉", "玉ねぎ", "生姜"] },
@@ -236,24 +274,50 @@
 
   const days = ["月曜日", "火曜日", "水曜日", "木曜日", "金曜日"];
 
-  function getRandomItem(array) {
-    return array[Math.floor(Math.random() * array.length)];
-  }
-
-  // 配列をシャッフルする関数（日数のランダム抽選用）
   function shuffleArray(array) {
     return array.sort(() => Math.random() - 0.5);
+  }
+
+  // ルールに沿って「連続2日まで」の条件を満たす配列を1カテゴリ分生成する関数
+  function generateConsecutiveList(databaseList) {
+    let result = [];
+    let lastItem = null;
+    let consecutiveCount = 0;
+
+    for (let i = 0; i < 5; i++) {
+      // 直前と同じものを連続して良い（ただし2日間まで）かつ、完全ランダム
+      let availableItems = [...databaseList];
+      
+      // もしすでに2連続しているなら、そのアイテムは選べないように除外
+      if (consecutiveCount >= 2) {
+        availableItems = availableItems.filter(item => item.name !== lastItem.name);
+      }
+
+      const selected = availableItems[Math.floor(Math.random() * availableItems.length)];
+      
+      if (lastItem && selected.name === lastItem.name) {
+        consecutiveCount++;
+      } else {
+        consecutiveCount = 1;
+      }
+      
+      result.push(selected);
+      lastItem = selected;
+    }
+    return result;
   }
 
   function generateWeeklyMenu() {
     const keyword = document.getElementById("mainIngredient").value.trim();
     const menuContainer = document.getElementById("weeklyMenu");
     const shoppingContainer = document.getElementById("shoppingList");
+    const linkArea = document.getElementById("linkArea");
     
     menuContainer.innerHTML = "";
     shoppingContainer.innerHTML = "";
+    linkArea.style.display = "none"; // 初期化
 
-    // キーワードにマッチする主菜を抽出
+    // 1. 指定食材の抽出
     let matchedMains = [];
     if (keyword) {
       matchedMains = recipeDatabase.main.filter(item => 
@@ -261,63 +325,83 @@
       );
     }
 
-    if (keyword && matchedMains.length === 0) {
-      matchedMains.push({ name: `${keyword}のおまかせ料理`, ingredients: [`${keyword}（メイン食材）`] });
+    // 💡 新機能: もしヒットしなかった、または登録数が少なすぎる場合は外部リンクを表示
+    // 5日間のうち2〜3回使うため、マッチした料理が2つ未満の場合にリンクを出す仕様にしています
+    if (keyword && matchedMains.length < 2) {
+      linkArea.style.display = "block";
+      // データベース上に全く料理がない場合、その場で仮のメニューを作成して救済
+      if (matchedMains.length === 0) {
+        matchedMains.push(
+          { name: `${keyword}の創作メイン①`, ingredients: [`${keyword}（メイン食材）`] },
+          { name: `${keyword}の創作メイン②`, ingredients: [`${keyword}（メイン食材）`] }
+        );
+      }
     }
 
-    // ② 5日間のうち「2〜3回」使用する日をランダムに決める
-    const targetCount = keyword ? Math.floor(Math.random() * 2) + 2 : 0; // 2か3をランダムで決定
+    // 2. 主菜の選定（5日間で重複なし）
+    let selectedMains = [];
+    const targetCount = keyword ? Math.floor(Math.random() * 2) + 2 : 0; // 指定食材を使う日数（2か3）
+    
     const dayIndices = [0, 1, 2, 3, 4];
     shuffleArray(dayIndices);
-    const guaranteedDays = dayIndices.slice(0, targetCount); // 指定食材を入れる日のインデックス配列
+    const guaranteedDays = dayIndices.slice(0, targetCount);
+      // シャッフルした全体リストを作っておく
+    let shuffledAllMains = shuffleArray([...recipeDatabase.main]);
+    let shuffledMatchedMains = shuffleArray([...matchedMains]);
 
-    let allIngredients = []; // 買い物リスト用
-
-    // 5日分のループ
     for (let i = 0; i < 5; i++) {
-      let selectedMainItem;
-
-      // 指定食材を入れる対象日の場合
+      let chosen;
       if (guaranteedDays.includes(i)) {
-        selectedMainItem = getRandomItem(matchedMains);
+        // 指定食材を使う日
+        chosen = shuffledMatchedMains.pop();
+        // 万が一、指定食材のバリエーションが尽きたら全体から補充
+        if (!chosen) chosen = shuffledAllMains.pop(); 
       } else {
-        // それ以外の日は、指定食材と「重複しない」メニューを選ぶ（極力バラけさせるため）
-        let remainingMains = recipeDatabase.main.filter(item => !matchedMains.includes(item));
-        if (remainingMains.length === 0) remainingMains = recipeDatabase.main; // 万が一空なら全体から
-        selectedMainItem = getRandomItem(remainingMains);
+        // 指定食材を使わない日（他の主菜と被らないように選ぶ）
+        // 指定食材リストに含まれていないもので、かつ、まだ使っていないものを探す
+        chosen = shuffledAllMains.find(item => !matchedMains.some(m => m.name === item.name));
+        // 条件に合うものがなければ、まだ使っていない主菜から選ぶ
+        if (!chosen) chosen = shuffledAllMains.pop();
+        // 使用済みとしてシャッフル全体リストから除外
+        shuffledAllMains = shuffledAllMains.filter(item => item.name !== chosen.name);
       }
+      selectedMains[i] = chosen;
+    }
 
-      const selectedSubItem = getRandomItem(recipeDatabase.sub);
-      const selectedSaladItem = getRandomItem(recipeDatabase.salad);
-      const selectedSoupItem = getRandomItem(recipeDatabase.soup);
+    // 3. 副菜・サラダ・汁物の選定（副菜と汁物は2日間連続まで重複OKルールを適用）
+    const selectedSubs = generateConsecutiveList(recipeDatabase.sub);
+    const selectedSoups = generateConsecutiveList(recipeDatabase.soup);
+    
+    // サラダは特に連続ルールの指定がありませんが、せっかくなので同じ連続2日ルールを適用させておきます
+    const selectedSalads = generateConsecutiveList(recipeDatabase.salad);
 
-      // 食材を買い物リストに集約
-      allIngredients.push(...selectedMainItem.ingredients);
-      allIngredients.push(...selectedSubItem.ingredients);
-      allIngredients.push(...selectedSaladItem.ingredients);
-      allIngredients.push(...selectedSoupItem.ingredients);
+    let allIngredients = [];
 
-      // 指定食材が含まれているか判定
-      const isHighlighted = keyword && selectedMainItem.name.includes(keyword) ? "highlight" : "";
+    // 4. 画面への出力
+    for (let i = 0; i < 5; i++) {
+      const mainItem = selectedMains[i];
+      const subItem = selectedSubs[i];
+      const saladItem = selectedSalads[i];
+      const soupItem = selectedSoups[i];
 
-      // 画面（献立カード）に出力
+      allIngredients.push(...mainItem.ingredients, ...subItem.ingredients, ...saladItem.ingredients, ...soupItem.ingredients);
+
+      const isHighlighted = keyword && mainItem.name.includes(keyword) ? "highlight" : "";
+
       const card = document.createElement("div");
       card.className = "day-card";
       card.innerHTML = `
         <div class="day-title">${days[i]}</div>
-        <div class="menu-item"><span class="label">主菜</span><span class="${isHighlighted}">${selectedMainItem.name}</span></div>
-        <div class="menu-item"><span class="label">副菜</span>${selectedSubItem.name}</div>
-        <div class="menu-item"><span class="label">サラダ</span>${selectedSaladItem.name}</div>
-        <div class="menu-item"><span class="label">汁物</span>${selectedSoupItem.name}</div>
+        <div class="menu-item"><span class="label">主菜</span><span class="${isHighlighted}">${mainItem.name}</span></div>
+        <div class="menu-item"><span class="label">副菜</span>${subItem.name}</div>
+        <div class="menu-item"><span class="label">サラダ</span>${saladItem.name}</div>
+        <div class="menu-item"><span class="label">汁物</span>${soupItem.name}</div>
       `;
       menuContainer.appendChild(card);
     }
 
-    // ③ 買い物リストの重複を消してきれいに表示
+    // 5. 買い物リストの出力
     const uniqueIngredients = [...new Set(allIngredients)];
-    
-    
-    // 基本的な調味料や常備されがちなものは別枠か除外すると見やすいですが、今回は全出力してカテゴリ分類
     const shoppingHTML = `
       <div class="shopping-grid">
         <div class="shopping-category">
@@ -329,12 +413,9 @@
       </div>
     `;
     shoppingContainer.innerHTML = shoppingHTML;
-
-    // 最初に隠していた結果エリアを表示する
     document.getElementById("resultArea").style.display = "block";
   }
 
-  // PWA用のサービスワーカーの登録スクリプト
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('sw.js')
