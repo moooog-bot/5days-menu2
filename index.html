@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>5日間の献立ジェネレーター</title>
+  <link rel="link" href="manifest.json" rel="manifest">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  
+  <style>
+    body {
+      font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", sans-serif;
+      background-color: #ffffff;
+      color: #333333;
+      line-height: 1.6;
+      margin: 0;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 26px;
+      margin-bottom: 10px;
+      letter-spacing: 1px;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: #777777;
+      margin-bottom: 40px;
+    }
+
+    /* 入力フォーム */
+    .search-box {
+      margin-bottom: 40px;
+      background-color: #fafafa;
+      padding: 30px;
+      border-radius: 8px;
+      border: 1px solid #eeeeee;
+    }
+
+    .search-box p {
+      margin-top: 0;
+      font-size: 14px;
+      color: #555555;
+    }
+
+    input[type="text"] {
+      padding: 12px 15px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      width: 280px;
+      max-width: 100%;
+      margin-bottom: 15px;
+      box-sizing: border-box;
+    }
+
+    button {
+      padding: 12px 30px;
+      font-size: 16px;
+      background-color: #333333;
+      color: #ffffff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      width: 280px;
+      max-width: 100%;
+    }
+
+    button:hover {
+      background-color: #555555;
+    }
+
+    /* 結果エリア（最初は非表示） */
+    .result-section {
+      display: none;
+      text-align: left;
+    }
+
+    h2 {
+      font-size: 20px;
+      border-left: 4px solid #333333;
+      padding-left: 10px;
+      margin-top: 40px;
+      margin-bottom: 20px;
+    }
+
+    /* 5日間のグリッド */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 15px;
+    }
+
+    .day-card {
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      padding: 15px;
+      background-color: #ffffff;
+    }
+
+    .day-title {
+      font-weight: bold;
+      font-size: 16px;
+      text-align: center;
+      border-bottom: 2px solid #333333;
+      padding-bottom: 5px;
+      margin-bottom: 15px;
+    }
+
+    .menu-item {
+      margin-bottom: 12px;
+      font-size: 13px;
+    }
+
+    .label {
+      font-size: 10px;
+      color: #888888;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .highlight {
+      color: #d9534f;
+      font-weight: bold;
+    }
+
+    /* 買い物リスト */
+    .shopping-list {
+      background-color: #fafafa;
+      border: 1px solid #eeeeee;
+      border-radius: 8px;
+      padding: 20px 30px;
+    }
+
+    .shopping-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 20px;
+    }
+
+    .shopping-category h3 {
+      font-size: 14px;
+      margin-top: 0;
+      margin-bottom: 10px;
+      color: #555555;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 3px;
+    }
+
+    .shopping-category ul {
+      margin: 0;
+      padding-left: 20px;
+      font-size: 13px;
+    }
+
+    .shopping-category li {
+      margin-bottom: 5px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>平日5日間の献立作成</h1>
+  <div class="subtitle">買い出しを楽にするメニュー・ショッピングリスト</div>
+
+  <div class="search-box">
+    <p>今週使いたいメイン食材を入力してください</p>
+    <input type="text" id="mainIngredient" placeholder="例：豚、鶏、鮭（空欄でもOK）"><br>
+    <button onclick="generateWeeklyMenu()">献立と買い物リストを作る</button>
+  </div>
+
+  <div id="resultArea" class="result-section">
+    <h2>5日間の献立</h2>
+    <div class="grid" id="weeklyMenu"></div>
+
+    <h2>買い物一覧（5日分）</h2>
+    <div class="shopping-list" id="shoppingList"></div>
+  </div>
+</div>
+
+<script>
+  // --- 料理データベースと必要な食材リスト ---
+  const recipeDatabase = {
+    main: [
+      { name: "豚肉の生姜焼き", keywords: ["豚", "豚肉"], ingredients: ["豚薄切り肉", "玉ねぎ", "生姜"] },
+      { name: "豚キムチ炒め", keywords: ["豚", "豚肉"], ingredients: ["豚バラ肉", "キムチ", "ニラ"] },
+      { name: "とんかつ", keywords: ["豚", "豚肉"], ingredients: ["豚ロース肉", "キャベツ", "卵", "パン粉"] },
+      { name: "鶏の唐揚げ", keywords: ["鶏", "鶏肉", "とり"], ingredients: ["鶏もも肉", "レモン"] },
+      { name: "親子丼の具", keywords: ["鶏", "鶏肉", "とり", "卵"], ingredients: ["鶏むね肉", "玉ねぎ", "卵", "三つ葉"] },
+      { name: "チキン南蛮", keywords: ["鶏", "鶏肉", "とり"], ingredients: ["鶏もも肉", "卵", "玉ねぎ", "タルタルソース"] },
+      { name: "牛丼の具", keywords: ["牛", "牛肉"], ingredients: ["牛薄切り肉", "玉ねぎ", "紅生姜"] },
+      { name: "青椒肉絲", keywords: ["牛", "牛肉", "豚", "豚肉"], ingredients: ["豚肉または牛肉", "ピーマン", "たけのこ水煮"] },
+      { name: "ハンバーグ", keywords: ["牛", "豚", "ひき肉"], ingredients: ["合挽き肉", "玉ねぎ", "卵", "パン粉"] },
+      { name: "鮭の塩焼き", keywords: ["鮭", "シャケ", "魚"], ingredients: ["鮭の切り身", "大根（大根おろし用）"] },
+      { name: "サバの味噌煮", keywords: ["鯖", "サバ", "魚"], ingredients: ["サバの切り身", "生姜"] },
+      { name: "タラのムニエル", keywords: ["タラ", "白身魚", "魚"], ingredients: ["タラの切り身", "レモン", "バター"] },
+      { name: "麻婆豆腐", keywords: ["豚", "ひき肉", "豆腐"], ingredients: ["豚ひき肉", "豆腐", "長ネギ"] },
+      { name: "肉じゃが", keywords: ["牛", "豚", "じゃがいも"], ingredients: ["豚肉または牛肉", "じゃがいも", "人参", "玉ねぎ", "しらたき"] }
+    ],
+    sub: [
+      { name: "ほうれん草のお浸し", ingredients: ["ほうれん草", "かつお節"] },
+      { name: "きんぴらごぼう", ingredients: ["ごぼう", "人参", "ごま"] },
+      { name: "ひじきの煮物", ingredients: ["ひじき", "人参", "油揚げ"] },
+      { name: "茄子の煮浸し", ingredients: ["茄子", "生姜"] },
+      { name: "かぼちゃの煮物", ingredients: ["かぼちゃ"] },
+      { name: "出し巻き卵", ingredients: ["卵"] },
+      { name: "ピーマンの塩昆布炒め", ingredients: ["ピーマン", "塩昆布"] },
+      { name: "小松菜の胡麻和え", ingredients: ["小松菜", "すりごま"] }
+    ],
+    salad: [
+      { name: "ポテトサラダ", ingredients: ["じゃがいも", "きゅうり", "ハム", "マヨネーズ"] },
+      { name: "キャベツとツナのサラダ", ingredients: ["キャベツ", "ツナ缶"] },
+      { name: "トマトと豆腐のサラダ", ingredients: ["トマト", "豆腐", "ドレッシング"] },
+      { name: "レタスとチョレギサラダ", ingredients: ["レタス", "韓国のり", "ごま"] },
+      { name: "大根とジャコのサラダ", ingredients: ["大根", "じゃこ"] }
+    ],
+    soup: [
+      { name: "豆腐とわかめのお味噌汁", ingredients: ["豆腐", "わかめ", "味噌"] },
+      { name: "お揚げと大根のお味噌汁", ingredients: ["油揚げ", "大根", "味噌"] },
+      { name: "豚汁", ingredients: ["豚バラ肉", "大根", "人参", "ごぼう", "味噌"] },
+      { name: "卵とわかめの中華スープ", ingredients: ["卵", "わかめ", "中華スープの素"] },
+      { name: "キャベツのコンソメスープ", ingredients: ["キャベツ", "玉ねぎ", "コンソメ"] }
+    ]
+  };
+
+  const days = ["月曜日", "火曜日", "水曜日", "木曜日", "金曜日"];
+
+  function getRandomItem(array) {
+    return array[Math.floor(Math.random() * array.length)];
+  }
+
+  // 配列をシャッフルする関数（日数のランダム抽選用）
+  function shuffleArray(array) {
+    return array.sort(() => Math.random() - 0.5);
+  }
+
+  function generateWeeklyMenu() {
+    const keyword = document.getElementById("mainIngredient").value.trim();
+    const menuContainer = document.getElementById("weeklyMenu");
+    const shoppingContainer = document.getElementById("shoppingList");
+    
+    menuContainer.innerHTML = "";
+    shoppingContainer.innerHTML = "";
+
+    // キーワードにマッチする主菜を抽出
+    let matchedMains = [];
+    if (keyword) {
+      matchedMains = recipeDatabase.main.filter(item => 
+        item.name.includes(keyword) || item.keywords.some(k => k.includes(keyword))
+      );
+    }
+
+    if (keyword && matchedMains.length === 0) {
+      matchedMains.push({ name: `${keyword}のおまかせ料理`, ingredients: [`${keyword}（メイン食材）`] });
+    }
+
+    // ② 5日間のうち「2〜3回」使用する日をランダムに決める
+    const targetCount = keyword ? Math.floor(Math.random() * 2) + 2 : 0; // 2か3をランダムで決定
+    const dayIndices = [0, 1, 2, 3, 4];
+    shuffleArray(dayIndices);
+    const guaranteedDays = dayIndices.slice(0, targetCount); // 指定食材を入れる日のインデックス配列
+
+    let allIngredients = []; // 買い物リスト用
+
+    // 5日分のループ
+    for (let i = 0; i < 5; i++) {
+      let selectedMainItem;
+
+      // 指定食材を入れる対象日の場合
+      if (guaranteedDays.includes(i)) {
+        selectedMainItem = getRandomItem(matchedMains);
+      } else {
+        // それ以外の日は、指定食材と「重複しない」メニューを選ぶ（極力バラけさせるため）
+        let remainingMains = recipeDatabase.main.filter(item => !matchedMains.includes(item));
+        if (remainingMains.length === 0) remainingMains = recipeDatabase.main; // 万が一空なら全体から
+        selectedMainItem = getRandomItem(remainingMains);
+      }
+
+      const selectedSubItem = getRandomItem(recipeDatabase.sub);
+      const selectedSaladItem = getRandomItem(recipeDatabase.salad);
+      const selectedSoupItem = getRandomItem(recipeDatabase.soup);
+
+      // 食材を買い物リストに集約
+      allIngredients.push(...selectedMainItem.ingredients);
+      allIngredients.push(...selectedSubItem.ingredients);
+      allIngredients.push(...selectedSaladItem.ingredients);
+      allIngredients.push(...selectedSoupItem.ingredients);
+
+      // 指定食材が含まれているか判定
+      const isHighlighted = keyword && selectedMainItem.name.includes(keyword) ? "highlight" : "";
+
+      // 画面（献立カード）に出力
+      const card = document.createElement("div");
+      card.className = "day-card";
+      card.innerHTML = `
+        <div class="day-title">${days[i]}</div>
+        <div class="menu-item"><span class="label">主菜</span><span class="${isHighlighted}">${selectedMainItem.name}</span></div>
+        <div class="menu-item"><span class="label">副菜</span>${selectedSubItem.name}</div>
+        <div class="menu-item"><span class="label">サラダ</span>${selectedSaladItem.name}</div>
+        <div class="menu-item"><span class="label">汁物</span>${selectedSoupItem.name}</div>
+      `;
+      menuContainer.appendChild(card);
+    }
+
+    // ③ 買い物リストの重複を消してきれいに表示
+    const uniqueIngredients = [...new Set(allIngredients)];
+    
+    
+    // 基本的な調味料や常備されがちなものは別枠か除外すると見やすいですが、今回は全出力してカテゴリ分類
+    const shoppingHTML = `
+      <div class="shopping-grid">
+        <div class="shopping-category">
+          <h3>必要な食材（まとめ）</h3>
+          <ul>
+            ${uniqueIngredients.map(ing => `<li><label><input type="checkbox"> ${ing}</label></li>`).join('')}
+          </ul>
+        </div>
+      </div>
+    `;
+    shoppingContainer.innerHTML = shoppingHTML;
+
+    // 最初に隠していた結果エリアを表示する
+    document.getElementById("resultArea").style.display = "block";
+  }
+
+  // PWA用のサービスワーカーの登録スクリプト
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js')
+        .then(reg => console.log('Service Worker 登録成功:', reg.scope))
+        .catch(err => console.log('Service Worker 登録失敗:', err));
+    });
+  }
+</script>
+
+</body>
+</html>

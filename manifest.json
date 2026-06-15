@@ -1,0 +1,16 @@
+{
+  "short_name": "献立作成",
+  "name": "5日間の献立・買い物ジェネレーター",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    }
+  ],
+  "start_url": "index.html",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "theme_color": "#333333",
+  "orientation": "portrait"
+}
