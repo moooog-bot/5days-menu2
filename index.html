@@ -188,8 +188,11 @@
 </div>
 
 <script>
-  // 🔑 取得したAPIキーをここに貼り付けてください（改行なしの1行で！）
-  const GEMINI_API_KEY = 'AQ.Ab8RN6KmeVe6TcKrmOZ9RNOrPA2NJympcuAVOPtldhrAI4vHWQ';
+  // 🔑 OpenRouterのAPIキーをここに貼り付けてください（sk-or-から始まるもの）
+  const OPENROUTER_API_KEY = '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';
+  
+  // 🤖 使用したいAIモデルのIDを指定します（例: Gemini 2.5 Flashを使用する場合）
+  const AI_MODEL = 'google/gemini-2.5-flash:free';
 
   window.onload = function() {
     if(localStorage.getItem('stock_ing')) document.getElementById('stockIngredients').value = localStorage.getItem('stock_ing');
@@ -226,13 +229,14 @@
     try {
       await generateMenuPlan(screenshotText);
     } catch (error) {
-  alert(error.message);
-  console.error(error);
-}
+      alert(error.message);
+      console.error(error);
+    }
 
     loadingText.style.display = "none";
   }
 
+  // 1. スクショ解析関数（OpenRouter対応版）
   async function analyzeScreenshot(file) {
     const base64Data = await new Promise((resolve) => {
       const reader = new FileReader();
@@ -243,23 +247,35 @@
     const prompt = `画像から、料理名と必要な具体的な食材（肉や野菜などのメイン固形物のみ）を抜き出し、以下のJSON形式でのみ返してください。
 {"name": "料理名", "ingredients": ["食材1", "食材2"]} `;
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+    const url = "https://openrouter.ai/api/v1/chat/completions";
     const response = await fetch(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+        'HTTP-Referer': window.location.href, // OpenRouterのランキング等に表示するためのコード
+        'X-Title': '5日間献立ジェネレーター'
+      },
       body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }, { inlineData: { mimeType: file.type, data: base64Data } }] }]
+        model: AI_MODEL,
+        messages: [
+          {
+            role: "user",
+            content: [
+              { type: "text", text: prompt },
+              { type: "image_url", image_url: { url: `data:${file.type};base64,${base64Data}` } }
+            ]
+          }
+        ]
       })
     });
 
     const json = await response.json();
-    if (!json.candidates || json.candidates.length === 0) {
-      throw new Error("スクショの解析に失敗しました。");
+    if (!response.ok || !json.choices || json.choices.length === 0) {
+      throw new Error("スクショの解析に失敗しました。" + (json.error?.message || ""));
     }
     
-    const responseText = json.candidates[0].content.parts[0].text.trim();
-    
-    // 【改善点】余計なテキストが入っても、{} の中身だけを強引に抽出してパースする
+    const responseText = json.choices[0].message.content.trim();
     const jsonMatch = responseText.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       throw new Error("有効なJSONデータが返されませんでした。");
@@ -267,6 +283,7 @@
     return JSON.parse(jsonMatch[0]);
   }
 
+  // 2. 献立作成関数（OpenRouter対応版）
   async function generateMenuPlan(screenshotInfo) {
     const stock = document.getElementById("stockIngredients").value || "特になし";
     const priority = document.getElementById("priorityIngredients").value || "特になし";
@@ -410,37 +427,48 @@ ${always}
 - 主菜が豚こまに偏らないようにしてください。  
 - 炒め物が多くなりすぎないようにしてください。`;
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
-    
+    const url = "https://openrouter.ai/api/v1/chat/completions";
     const response = await fetch(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contents: [{ parts: [{ text: mainPrompt }] }] })
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+        'HTTP-Referer': window.location.href,
+        'X-Title': '5日間献立ジェネレーター'
+      },
+      body: JSON.stringify({
+        model: AI_MODEL,
+        messages: [
+          { role: "user", content: mainPrompt }
+        ]
+      })
     });
 
     const json = await response.json();
-    console.log(json); // デバッグ用にAPIの生のレスポンスをコンソールに出力
+    console.log(json); 
+
     if (!response.ok) {
-  alert(JSON.stringify(json, null, 2));
-  return;
-}
-    if (!json.candidates || json.candidates.length === 0) {
+      alert(JSON.stringify(json, null, 2));
+      return;
+    }
+    if (!json.choices || json.choices.length === 0) {
       throw new Error("じぇみちゃんからの応答がありませんでした。APIキーやプロンプトを確認してください。");
     }
 
-    let resultText = json.candidates[0].content.parts[0].text;
+    let resultText = json.choices[0].message.content;
 
-    // 【利便性UP】マークダウンを簡易的なHTMLタグに変換して見栄えを良くする
+    // マークダウンを簡易的なHTMLタグに変換
     resultText = resultText
-      .replace(/- \[ \]/g, "▢") // 元のチェックボックス置換
-      .replace(/## (.*)/g, '<h3>$1</h3>') // 見出し2
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // 太字
-      .replace(/\n/g, '<br>'); // 改行
+      .replace(/- \[ \]/g, "▢") 
+      .replace(/## (.*)/g, '<h3>$1</h3>') 
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') 
+      .replace(/\n/g, '<br>'); 
 
-    resultArea.innerHTML = resultText; // innerTextからinnerHTMLに変更
+    resultArea.innerHTML = resultText; 
     resultArea.style.display = "block";
   }
 </script>
+
 
 </body>
 </html>
