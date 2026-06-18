@@ -226,9 +226,9 @@
     try {
       await generateMenuPlan(screenshotText);
     } catch (error) {
-      alert("通信エラーまたはAPIエラーが発生しました。もう一度試してみてください。");
-      console.error(error);
-    }
+  alert(error.message);
+  console.error(error);
+}
 
     loadingText.style.display = "none";
   }
