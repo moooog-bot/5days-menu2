@@ -243,7 +243,7 @@
     const prompt = `画像から、料理名と必要な具体的な食材（肉や野菜などのメイン固形物のみ）を抜き出し、以下のJSON形式でのみ返してください。
 {"name": "料理名", "ingredients": ["食材1", "食材2"]} `;
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -410,7 +410,7 @@ ${always}
 - 主菜が豚こまに偏らないようにしてください。  
 - 炒め物が多くなりすぎないようにしてください。`;
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${GEMINI_API_KEY}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=${GEMINI_API_KEY}`;
     
     const response = await fetch(url, {
       method: 'POST',
@@ -419,6 +419,11 @@ ${always}
     });
 
     const json = await response.json();
+    console.log(json); // デバッグ用にAPIの生のレスポンスをコンソールに出力
+    if (!response.ok) {
+  alert(JSON.stringify(json, null, 2));
+  return;
+}
     if (!json.candidates || json.candidates.length === 0) {
       throw new Error("じぇみちゃんからの応答がありませんでした。APIキーやプロンプトを確認してください。");
     }
