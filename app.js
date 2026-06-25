@@ -1049,14 +1049,30 @@ function clearSavedResult() {
 
 }
 
-// エラーを消して、とりあえずAIの返事を無理やり画面に出すための緊急コード
+/**
+ * AIからの献立を画面に表示する関数（エラー解消用）
+ * @param {string} text - AIから返ってきた献立のテキスト
+ */
 function showResult(text) {
-    console.log("★AIからの返事は無事に届いています！:", text);
-    // 画面の結果表示エリア（IDがresultかmenuPlanだと仮定）に文字を入れ込む
-    const resultArea = document.getElementById('result') || document.getElementById('menuPlan');
-    if (resultArea) {
-        resultArea.innerText = text;
+    console.log("★じぇみちゃんからの献立データ:", text);
+    
+    // 1. 画面の中に結果を表示できそうなエリア（ID名）を探す
+    // あなたのHTMLの記述に合わせて、一般的なID名（result, output, menu-containerなど）を片っ端から探します
+    const targetArea = 
+        document.getElementById('result') || 
+        document.getElementById('output') || 
+        document.getElementById('menuPlan') || 
+        document.getElementById('menu-container') ||
+        document.querySelector('.result-area'); // クラス名も探す
+
+    if (targetArea) {
+        // 見つかったら、そこにAIの文章を流し込む
+        // 改行を正しく表示するために innerText を使います
+        targetArea.innerText = text; 
     } else {
-        alert("AIからの献立：\n\n" + text);
+        // 万が一、画面に表示する場所すら見つからない場合は、最終手段としてポップアップで出す
+        alert("ーーー 献立が完成しました！ ーーー\n\n" + text);
     }
 }
+
+
