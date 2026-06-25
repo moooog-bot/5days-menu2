@@ -1,0 +1,590 @@
+/* =====================
+
+   ベース
+
+===================== */
+
+body {
+
+  font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", sans-serif;
+
+  background-color: #ffffff;
+
+  color: #333333;
+
+  line-height: 1.6;
+
+  margin: 0;
+
+  padding: 40px 20px;
+
+}
+
+ 
+
+.container {
+
+  max-width: 750px;
+
+  margin: 0 auto;
+
+  text-align: left;
+
+}
+
+ 
+
+/* =====================
+
+   ヘッダー
+
+===================== */
+
+h1 {
+
+  font-size: 24px;
+
+  margin-bottom: 5px;
+
+  letter-spacing: 1px;
+
+  text-align: center;
+
+}
+
+ 
+
+.subtitle {
+
+  font-size: 13px;
+
+  color: #777777;
+
+  margin-bottom: 35px;
+
+  text-align: center;
+
+}
+
+ 
+
+/* =====================
+
+   エラー表示
+
+===================== */
+
+.error-area {
+
+  background-color: #fff2f2;
+
+  border: 1px solid #ffcccc;
+
+  color: #cc0000;
+
+  border-radius: 6px;
+
+  padding: 14px 18px;
+
+  margin-bottom: 20px;
+
+  font-size: 14px;
+
+  line-height: 1.6;
+
+}
+
+ 
+
+/* =====================
+
+   フォーム
+
+===================== */
+
+.form-section {
+
+  background-color: #fafafa;
+
+  padding: 25px 30px;
+
+  border-radius: 8px;
+
+  border: 1px solid #eeeeee;
+
+  margin-bottom: 30px;
+
+}
+
+ 
+
+.form-group {
+
+  margin-bottom: 18px;
+
+}
+
+ 
+
+.form-group label {
+
+  display: block;
+
+  font-size: 14px;
+
+  font-weight: bold;
+
+  margin-bottom: 6px;
+
+  color: #444444;
+
+}
+
+ 
+
+input[type="text"],
+
+textarea,
+
+select {
+
+  width: 100%;
+
+  padding: 10px 12px;
+
+  font-size: 15px;
+
+  border: 1px solid #cccccc;
+
+  border-radius: 4px;
+
+  box-sizing: border-box;
+
+  font-family: inherit;
+
+  outline: none;
+
+  transition: border-color 0.2s, box-shadow 0.2s;
+
+}
+
+ 
+
+/* iPhone等でフォームの見た目を安定させる */
+
+input[type="text"],
+
+textarea,
+
+button {
+
+  -webkit-appearance: none;
+
+  appearance: none;
+
+}
+
+ 
+
+input[type="text"]:focus,
+
+textarea:focus,
+
+select:focus {
+
+  border-color: #333333;
+
+  box-shadow: 0 0 0 2px rgba(51, 51, 51, 0.15);
+
+}
+
+ 
+
+textarea {
+
+  height: 60px;
+
+  min-height: 60px;
+
+  resize: vertical;
+
+}
+
+ 
+
+textarea {
+
+  height: 60px;
+
+  min-height: 60px;
+
+  resize: vertical;
+
+}
+
+ 
+
+.form-heading {
+
+  font-size: 16px;
+
+  margin: 28px 0 14px;
+
+  padding: 8px 12px;
+
+  border-left: 4px solid #f4a7b9;
+
+  background: #fff7fa;
+
+  color: #333333;
+
+  border-radius: 6px;
+
+}
+
+ 
+
+/* =====================
+
+   スクショゾーン
+
+===================== */
+
+.screenshot-zone {
+
+  border: 1px dashed #cccccc;
+
+  background-color: #ffffff;
+
+  padding: 15px;
+
+  border-radius: 4px;
+
+}
+
+ 
+
+.screenshot-zone label {
+
+  font-size: 14px;
+
+  font-weight: bold;
+
+  color: #444444;
+
+  margin-bottom: 8px;
+
+  display: block;
+
+}
+
+ 
+
+.screenshot-zone input {
+
+  margin-top: 5px;
+
+}
+
+ 
+
+input[type="file"] {
+
+  font-size: 14px;
+
+  max-width: 100%;
+
+}
+
+ 
+
+/* =====================
+
+   ボタン共通
+
+===================== */
+
+.btn-container {
+
+  text-align: center;
+
+  margin-top: 25px;
+
+}
+
+ 
+
+button {
+
+  padding: 14px 40px;
+
+  font-size: 16px;
+
+  background-color: #333333;
+
+  color: #ffffff;
+
+  border: none;
+
+  border-radius: 4px;
+
+  cursor: pointer;
+
+  transition: background-color 0.2s;
+
+  width: 100%;
+
+  max-width: 320px;
+
+  font-weight: bold;
+
+  margin: 5px;
+
+  white-space: nowrap;
+
+  outline: none;
+
+}
+
+ 
+
+button:hover {
+
+  background-color: #555555;
+
+}
+
+ 
+
+button:focus-visible {
+
+  outline: 2px solid #333333;
+
+  outline-offset: 2px;
+
+}
+
+ 
+
+button:disabled {
+
+  background-color: #999999;
+
+  cursor: not-allowed;
+
+  pointer-events: none;
+
+}
+
+ 
+
+.secondary-btn {
+
+  background-color: #ffffff;
+
+  color: #333333;
+
+  border: 1px solid #333333;
+
+}
+
+ 
+
+.secondary-btn:hover {
+
+  background-color: #f3f3f3;
+
+}
+
+ 
+
+/* =====================
+
+  ローディング
+
+===================== */
+
+.loading {
+
+  font-size: 14px;
+
+  color: #666666;
+
+  margin-top: 15px;
+
+  text-align: center;
+
+  line-height: 1.8;
+
+}
+
+ 
+
+/* =====================
+
+   結果エリア
+
+===================== */
+
+.result-section {
+
+  background-color: #ffffff;
+
+  border: 1px solid #e0e0e0;
+
+  border-radius: 8px;
+
+  padding: 30px;
+
+  margin-top: 20px;
+
+  font-size: 15px;
+
+  line-height: 1.8;
+
+  word-break: break-word;
+
+  overflow-wrap: break-word;
+
+}
+
+ 
+
+.result-section h2 {
+
+  font-size: 18px;
+
+  color: #222222;
+
+  margin-top: 30px;
+
+  border-bottom: 2px solid #333333;
+
+  padding-bottom: 6px;
+
+}
+
+ 
+
+.result-section h3 {
+
+  font-size: 15px;
+
+  color: #444444;
+
+  margin-top: 20px;
+
+  border-bottom: 1px solid #eeeeee;
+
+  padding-bottom: 5px;
+
+}
+
+ 
+
+.result-section h2:first-child,
+
+.result-section h3:first-child {
+
+  margin-top: 0;
+
+}
+
+ 
+
+.result-section ul {
+
+  padding-left: 20px;
+
+}
+
+ 
+
+/* =====================
+
+   結果アクション
+
+===================== */
+
+.result-actions {
+
+  text-align: center;
+
+  margin-top: 15px;
+
+}
+
+ 
+
+/* =====================
+
+   注記
+
+===================== */
+
+.note {
+
+  font-size: 12px;
+
+  color: #888888;
+
+  margin-top: 8px;
+
+  line-height: 1.5;
+
+}
+
+ 
+
+/* =====================
+
+   レスポンシブ
+
+===================== */
+
+@media (max-width: 480px) {
+
+  body {
+
+    padding: 20px 12px;
+
+  }
+
+ 
+
+  .form-section {
+
+    padding: 18px 16px;
+
+  }
+
+ 
+
+  .result-section {
+
+    padding: 20px 16px;
+
+  }
+
+ 
+
+  h1 {
+
+    font-size: 20px;
+
+  }
+
+ 
+
+  button {
+
+    max-width: 100%;
+
+    padding: 14px 16px;
+
+    font-size: 15px;
+
+  }
+
+}
+

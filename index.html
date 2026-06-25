@@ -1,474 +1,239 @@
 <!DOCTYPE html>
+
 <html lang="ja">
+
 <head>
+
   <meta charset="UTF-8">
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>5日間の献立ジェネレーター</title>
+
+ 
+
   <link rel="manifest" href="manifest.json">
+
   <link rel="apple-touch-icon" href="icon-192.png">
+
   <meta name="apple-mobile-web-app-capable" content="yes">
+
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  
-  <style>
-    body {
-      font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", sans-serif;
-      background-color: #ffffff;
-      color: #333333;
-      line-height: 1.6;
-      margin: 0;
-      padding: 40px 20px;
-    }
 
-    .container {
-      max-width: 750px;
-      margin: 0 auto;
-      text-align: left;
-    }
+ 
 
-    h1 {
-      font-size: 24px;
-      margin-bottom: 5px;
-      letter-spacing: 1px;
-      text-align: center;
-    }
+  <link rel="stylesheet" href="style.css">
 
-    .subtitle {
-      font-size: 13px;
-      color: #777777;
-      margin-bottom: 35px;
-      text-align: center;
-    }
-
-    .form-section {
-      background-color: #fafafa;
-      padding: 25px 30px;
-      border-radius: 8px;
-      border: 1px solid #eeeeee;
-      margin-bottom: 30px;
-    }
-
-    .form-group {
-      margin-bottom: 18px;
-    }
-
-    .form-group label {
-      display: block;
-      font-size: 14px;
-      font-weight: bold;
-      margin-bottom: 6px;
-      color: #444444;
-    }
-
-    input[type="text"], textarea, select {
-      width: 100%;
-      padding: 10px 12px;
-      font-size: 15px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      box-sizing: border-box;
-      font-family: inherit;
-    }
-
-    textarea {
-      height: 60px;
-      resize: vertical;
-    }
-
-    .screenshot-zone {
-      border: 1px dashed #cccccc;
-      background-color: #ffffff;
-      padding: 15px;
-      border-radius: 4px;
-      margin-top: 10px;
-    }
-
-    .screenshot-zone input {
-      margin-top: 5px;
-    }
-
-    .btn-container {
-      text-align: center;
-      margin-top: 25px;
-    }
-
-    button {
-      padding: 14px 40px;
-      font-size: 16px;
-      background-color: #333333;
-      color: #ffffff;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: background-color 0.2s;
-      width: 100%;
-      max-width: 320px;
-      font-weight: bold;
-    }
-
-    button:hover {
-      background-color: #555555;
-    }
-
-    .loading {
-      display: none;
-      font-size: 14px;
-      color: #666;
-      margin-top: 15px;
-      text-align: center;
-    }
-
-    /* AI出力結果表示エリア（HTML表示用に調整） */
-    .result-section {
-      display: none;
-      background-color: #ffffff;
-      border: 1px solid #e0e0e0;
-      border-radius: 8px;
-      padding: 30px;
-      margin-top: 20px;
-      font-size: 15px;
-      line-height: 1.8;
-    }
-    .result-section h2, .result-section h3 {
-      margin-top: 25px;
-      border-bottom: 1px solid #eee;
-      padding-bottom: 5px;
-    }
-    .result-section ul {
-      padding-left: 20px;
-    }
-  </style>
 </head>
+
+ 
+
 <body>
 
 <div class="container">
+
   <h1>平日5日間の献立作成</h1>
+
   <div class="subtitle">AIプランナー（じぇみちゃん）があなたに最適な献立を提案します</div>
 
+ 
+
+  <!-- エラー表示エリア -->
+
+  <div id="errorArea" class="error-area" style="display:none;" role="alert" aria-live="assertive"></div>
+
+ 
+
   <div class="form-section">
+
+ 
+
     <div class="form-group">
-      <label>【冷蔵庫・冷凍庫・食品庫にある食材】</label>
+
+      <label for="stockIngredients">【冷蔵庫・冷凍庫・食品庫にある食材】</label>
+
       <textarea id="stockIngredients" placeholder="例：キャベツ1/2玉、玉ねぎ2個、鶏もも肉2枚、冷凍うどん"></textarea>
+
     </div>
 
+ 
+
     <div class="form-group">
-      <label>【優先的に消費したい食材】※傷みやすいものなど</label>
+
+      <label for="priorityIngredients">【優先的に消費したい食材】※傷みやすいものなど</label>
+
       <input type="text" id="priorityIngredients" placeholder="例：ひき肉（今日まで）、もやし">
+
     </div>
 
+ 
+
     <div class="form-group">
-      <label>【常備食材】※基本固定、買い足し不要として計算</label>
+
+      <label for="alwaysIngredients">【常備食材】※基本固定、買い足し不要として計算</label>
+
       <textarea id="alwaysIngredients">卵、豆腐、納豆、牛乳、基本調味料（味噌・醤油・砂糖・塩・こしょう・油・マヨネーズ・ケチャップ・コンソメ・中華スープの素）</textarea>
+
     </div>
 
+ 
+
     <div class="form-group">
-      <label>【買い足し予算】</label>
+
+      <label for="budgetLimit">【買い足し予算】</label>
+
       <select id="budgetLimit">
+
         <option value="上限なし">上限なし</option>
+
         <option value="1500円">1500円</option>
+
         <option value="1000円">1000円</option>
+
         <option value="500円">500円</option>
+
         <option value="なし">なし（買い足さない）</option>
+
       </select>
+
     </div>
 
-    <div class="form-group">
-      <div class="screenshot-zone">
-        <label style="margin:0; color:#444;">【お気に入りインスタスクショ】※あれば選択</label>
-        <input type="file" id="screenshotInput" accept="image/*">
-      </div>
-    </div>
+ 
 
-    <div class="btn-container">
-      <button onclick="startAiPlanner()">献立をじぇみちゃんに考えてもらう</button>
-      <div id="loadingText" class="loading">⏳ じぇみちゃんが献立プランを一生懸命作成中...<br>（AIが思考するため10秒ほどかかります）</div>
-    </div>
-  </div>
+ 
 
-  <div id="resultArea" class="result-section"></div>
+<h2 class="form-heading">基本条件</h2>
+
+ 
+
+<div class="form-group">
+
+  <label for="adultCount">大人の人数</label>
+
+  <select id="adultCount">
+
+    <option value="1">1人</option>
+
+    <option value="2" selected>2人</option>
+
+    <option value="3">3人</option>
+
+    <option value="4">4人</option>
+
+  </select>
+
 </div>
 
-<script>
-  // 🔑 OpenRouterのAPIキーをここに貼り付けてください（sk-or-から始まるもの）
-  const OPENROUTER_API_KEY = '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';
-  
-  // 🤖 使用したいAIモデルのIDを指定します（例: Gemini 2.5 Flashを使用する場合）
-  const AI_MODEL = 'google/gemini-2.5-flash:free';
-
-  window.onload = function() {
-    if(localStorage.getItem('stock_ing')) document.getElementById('stockIngredients').value = localStorage.getItem('stock_ing');
-    if(localStorage.getItem('prior_ing')) document.getElementById('priorityIngredients').value = localStorage.getItem('prior_ing');
-    if(localStorage.getItem('always_ing')) document.getElementById('alwaysIngredients').value = localStorage.getItem('always_ing');
-    if(localStorage.getItem('budget_lim')) document.getElementById('budgetLimit').value = localStorage.getItem('budget_lim');
-  };
-
-  async function startAiPlanner() {
-    const fileInput = document.getElementById("screenshotInput");
-    const loadingText = document.getElementById("loadingText");
-    const resultArea = document.getElementById("resultArea");
-    
-    localStorage.setItem('stock_ing', document.getElementById('stockIngredients').value);
-    localStorage.setItem('prior_ing', document.getElementById('priorityIngredients').value);
-    localStorage.setItem('always_ing', document.getElementById('alwaysIngredients').value);
-    localStorage.setItem('budget_lim', document.getElementById('budgetLimit').value);
-
-    loadingText.style.display = "block";
-    resultArea.style.display = "none";
-
-    let screenshotText = "なし";
-
-    if (fileInput.files.length > 0) {
-      try {
-        const aiParsed = await analyzeScreenshot(fileInput.files[0]);
-        screenshotText = `料理名: ${aiParsed.name}, 必要な食材: ${aiParsed.ingredients.join(', ')}`;
-      } catch (error) {
-        console.error("スクショ解析エラー:", error);
-        screenshotText = "（画像の読み込みに一部失敗したため、定番のアイデアから補正してください）";
-      }
-    }
-
-    try {
-      await generateMenuPlan(screenshotText);
-    } catch (error) {
-      alert(error.message);
-      console.error(error);
-    }
-
-    loadingText.style.display = "none";
-  }
-
-  // 1. スクショ解析関数（OpenRouter対応版）
-  async function analyzeScreenshot(file) {
-    const base64Data = await new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result.split(',')[1]);
-      reader.readAsDataURL(file);
-    });
-
-    const prompt = `画像から、料理名と必要な具体的な食材（肉や野菜などのメイン固形物のみ）を抜き出し、以下のJSON形式でのみ返してください。
-{"name": "料理名", "ingredients": ["食材1", "食材2"]} `;
-
-    const url = "https://openrouter.ai/api/v1/chat/completions";
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-        'HTTP-Referer': window.location.href, // OpenRouterのランキング等に表示するためのコード
-        'X-Title': '5days menu planner - screenshot analysis' // OpenRouterのランキング等に表示するためのコード
-      },
-      body: JSON.stringify({
-        model: AI_MODEL,
-        messages: [
-          {
-            role: "user",
-            content: [
-              { type: "text", text: prompt },
-              { type: "image_url", image_url: { url: `data:${file.type};base64,${base64Data}` } }
-            ]
-          }
-        ]
-      })
-    });
-
-    const json = await response.json();
-    if (!response.ok || !json.choices || json.choices.length === 0) {
-      throw new Error("スクショの解析に失敗しました。" + (json.error?.message || ""));
-    }
-    
-    const responseText = json.choices[0].message.content.trim();
-    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      throw new Error("有効なJSONデータが返されませんでした。");
-    }
-    return JSON.parse(jsonMatch[0]);
-  }
-
-  // 2. 献立作成関数（OpenRouter対応版）
-  async function generateMenuPlan(screenshotInfo) {
-    const stock = document.getElementById("stockIngredients").value || "特になし";
-    const priority = document.getElementById("priorityIngredients").value || "特になし";
-    const always = document.getElementById("alwaysIngredients").value || "特になし";
-    const budget = document.getElementById("budgetLimit").value;
-    const resultArea = document.getElementById("resultArea");
-
-    const mainPrompt = `あなたは優秀な献立プランナー「じぇみちゃん」です。
-以下の条件をもとに、**大人2人分・平日5日分の夕食献立**を作成してください。
  
-## 基本条件
-【作成日数】5日分
-【対象曜日】平日のみ（月〜金）
-【必要な食事】夕食のみ
-【1食あたりの品数】主菜1品、副菜1品、サラダ1品、汁物1品
-【家族構成】大人2人
- 
-## 重視ポイント
-- 作り置きを活用する
-- お弁当に使い回せるおかずを含める
-- 平日は30分以内で作れる献立を優先する
-- 洗い物が多すぎないようにする
-- 栄養バランスを考慮する
- 
-## 調理傾向
-- 揚げ物は少なめ（月1位は可能）
-- 炒め物に偏らない
-- 煮る・焼く・蒸す・レンジ調理をバランスよく使う
-- 和食・洋食・中華を5日間でバランスよく組み合わせる
-- 作り置き考慮
-- 使い切りを目標に
-- STAN自動調理鍋有り。煮物系はこちらを使用可能
-- 山本ゆり、長谷川あかりのレシピが好み
- 
-## 手持ち食材
-【冷蔵庫・冷凍庫・食品庫にある食材】
-${stock}
- 
-【優先的に消費したい食材】
-${priority}
-※傷みやすいため、できるだけ早い日程で使用すること。
- 
-【常備食材】
-${always}
-※常備食材は買い足し不要として扱うこと。
 
-【★追加の限定バズレシピ条件】
-ユーザーが作りたいと思っているインスタのスクショレシピ情報： ${screenshotInfo}
-※もし「なし」以外であれば、このレシピを5日間のどこか1日の主菜または副菜に必ず組み込み、必要な食材も買い足し計算に含めてください。
- 
-## 買い足し条件
-【買い足し予算】 ${budget} を意識すること。
-【買い足し方針】
-- 魚を献立に取り入れること
-- 豚こま主菜に偏らないこと
-- 買い足しは必要最低限にすること
-- 高価な食材や特殊な調味料は避けること
-- 魚は鮭、白身魚、さば缶など、安価で扱いやすいものを優先すること
- 
-## 献立作成ルール
-1. 同じ主菜を繰り返さない  
-2. 主菜が豚こまばかりにならないようにする
-3. 同じ調理法が連続しすぎないようにする  
-4. 炒め物が多くなりすぎないようにする  
-5. 食材をできるだけ使い切る  
-6. 優先食材は早い日程で使用する  
-7. 作り置きや汁物の使い回しを提案する  
-8. お弁当に転用しやすいおかずを含める  
-9. 栄養バランスを考慮する  
-10. 現実的に家庭で作れる献立にする  
-11. 特殊な調味料や高価な食材は極力避ける  
-12. 毎日揚げ物にしない  
-13. 洗い物が多すぎる献立は避ける  
- 
-## 出力形式
-必ず以下の形式を完全に守って出力してください。見出しの記号なども統一してください。
- 
-■1日目（月）ジャンル：和食／洋食／中華など  
-主菜：  
-副菜：  
-サラダ：  
-汁物：  
-使用食材：  
-追加購入食材：  
-調理のポイント：  
-お弁当への使い回し：
- 
-■2日目（火）ジャンル：  
-主菜：  
-副菜：  
-サラダ：  
-汁物：  
-使用食材：  
-追加購入食材：  
-調理のポイント：  
-お弁当への使い回し：
- 
-■3日目（水）ジャンル：  
-主菜：  
-副菜：  
-サラダ：  
-汁物：  
-使用食材：  
-追加購入食材：  
-調理のポイント：  
-お弁当への使い回し：
- 
-■4日目（木）ジャンル：  
-主菜：  
-副菜：  
-サラダ：  
-汁物：  
-使用食材：  
-追加購入食材：  
-調理のポイント：  
-お弁当への使い回し：
- 
-■5日目（金）ジャンル：  
-主菜：  
-副菜：  
-サラダ：  
-汁物：  
-使用食材：  
-追加購入食材：  
-調理のポイント：  
-お弁当への使い回し：
- 
-## 最後に必ず出力する内容
-1. 期間全体で使用する食材一覧  
-2. 買い足しが必要な食材一覧（チェックボックス形式「- [ ] 食材名」で出力してください）
-3. 概算予算  
-4. 食材の使い切り状況  
-5. 作り置き・使い回しポイント  
-6. 5日間のジャンルバランス  
-7. 調理法のバランス  
- 
-## 注意点
-- 買い足し予算内を意識してください。  
-- ただし、味噌・醤油・砂糖・塩・こしょう・油などの基本調味料が常備に含まれていない場合は、必要に応じて「家にあれば買い足し不要」と補足してください。  
-- 魚を増やす場合でも、予算超えやすい場合は「さば缶」「特売の鮭」「冷凍白身魚」など節約案を提示してください。
-- 主菜が豚こまに偏らないようにしてください。  
-- 炒め物が多くなりすぎないようにしてください。`;
+<div class="form-group">
 
-    const url = "https://openrouter.ai/api/v1/chat/completions";
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-        'HTTP-Referer': window.location.href,
-        'X-Title': '5days menu planner'
-      },
-      body: JSON.stringify({
-        model: AI_MODEL,
-        messages: [
-          { role: "user", content: mainPrompt }
-        ]
-      })
-    });
+  <label for="childCount">子どもの人数</label>
 
-    const json = await response.json();
-    console.log(json); 
+  <select id="childCount">
 
-    if (!response.ok) {
-      alert(JSON.stringify(json, null, 2));
-      return;
-    }
-    if (!json.choices || json.choices.length === 0) {
-      throw new Error("じぇみちゃんからの応答がありませんでした。APIキーやプロンプトを確認してください。");
-    }
+    <option value="0" selected>0人</option>
 
-    let resultText = json.choices[0].message.content;
+    <option value="1">1人</option>
 
-    // マークダウンを簡易的なHTMLタグに変換
-    resultText = resultText
-      .replace(/- \[ \]/g, "▢") 
-      .replace(/## (.*)/g, '<h3>$1</h3>') 
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') 
-      .replace(/\n/g, '<br>'); 
+    <option value="2">2人</option>
 
-    resultArea.innerHTML = resultText; 
-    resultArea.style.display = "block";
-  }
-</script>
+    <option value="3">3人</option>
 
+    <option value="4">4人</option>
+
+  </select>
+
+</div>
+
+ 
+
+<div class="form-group">
+
+  <label for="dayCount">作成日数</label>
+
+  <select id="dayCount">
+
+    <option value="3">3日分</option>
+
+    <option value="4">4日分</option>
+
+    <option value="5" selected>5日分</option>
+
+    <option value="6">6日分</option>
+
+    <option value="7">7日分</option>
+
+  </select>
+
+</div>
+
+ 
+
+    <div class="form-group">
+
+      <div class="screenshot-zone">
+
+        <label for="screenshotInput">【お気に入りインスタスクショ】※あれば選択</label>
+
+        <input type="file" id="screenshotInput" accept="image/*">
+
+        <div class="note">画像から料理名と主な食材を読み取り、5日間のどこかに組み込みます。※5MB以内</div>
+
+      </div>
+
+    </div>
+
+ 
+
+    <div class="btn-container">
+
+      <button id="generateBtn" type="button">献立をじぇみちゃんに考えてもらう</button>
+
+      <div id="loadingText" class="loading" style="display:none;" aria-live="polite">
+
+        ⏳ じぇみちゃんが献立プランを一生懸命作成中...<br>
+
+        （AIが思考するため10〜30秒ほどかかります）
+
+      </div>
+
+      <div class="note">
+
+        ※APIキーをHTML内に直接入れる場合、公開サイトでは第三者に見られる可能性があります。
+
+      </div>
+
+    </div>
+
+ 
+
+  </div><!-- /.form-section -->
+
+ 
+
+  <div id="resultActions" class="result-actions" style="display:none;">
+
+    <button id="copyBtn" class="secondary-btn" type="button">献立をコピーする</button>
+
+    <button class="secondary-btn" type="button" onclick="clearSavedResult()">保存済み献立を消す</button>
+
+  </div>
+
+ 
+
+  <div id="resultArea" class="result-section" style="display:none;" aria-live="polite"></div>
+
+</div>
+
+ 
+
+<!-- DOMPurify: innerHTML注入前のサニタイズに使用 -->
+
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
+
+<script src="app.js"></script>
 
 </body>
+
 </html>
