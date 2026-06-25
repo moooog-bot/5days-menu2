@@ -851,6 +851,8 @@ function convertMarkdownToHtml(text) {
 
 async function callOpenRouter(messages) {
 
+  console.log("①ここを通ったら教えて！", messages); // ★この行を追加！
+
   const url = 'https://openrouter.ai/api/v1/chat/completions';
 
  
