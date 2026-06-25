@@ -551,7 +551,7 @@ async function generateMenuPlan(screenshotInfo) {
 
  
 
-  showResult(html);
+  alert("ーーー 献立が完成しました！ ーーー\n\n" + aiResponse);
 
 }
 
