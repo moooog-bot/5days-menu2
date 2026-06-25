@@ -979,7 +979,7 @@ async function callOpenRouter(messages) {
 
     if (e.name === 'AbortError') {
 
-      throw new Error('リクエストがタイムアウトしました（12秒）。時間をおいて再試行してください。');
+      throw new Error('リクエストがタイムアウトしました（120秒）。時間をおいて再試行してください。');
 
     }
 
