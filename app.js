@@ -8,7 +8,7 @@
 
 /** @type {string} OpenRouter APIキー（sk-or-...） */
 
-const OPENROUTER_API_KEY = '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';
+const OPENROUTER_API_KEY = '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';
 
  
 
