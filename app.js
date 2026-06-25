@@ -1048,3 +1048,15 @@ function clearSavedResult() {
   }
 
 }
+
+// エラーを消して、とりあえずAIの返事を無理やり画面に出すための緊急コード
+function showResult(text) {
+    console.log("★AIからの返事は無事に届いています！:", text);
+    // 画面の結果表示エリア（IDがresultかmenuPlanだと仮定）に文字を入れ込む
+    const resultArea = document.getElementById('result') || document.getElementById('menuPlan');
+    if (resultArea) {
+        resultArea.innerText = text;
+    } else {
+        alert("AIからの献立：\n\n" + text);
+    }
+}
