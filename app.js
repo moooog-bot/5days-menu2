@@ -14,7 +14,7 @@ const OPENROUTER_API_KEY = 'sk-or-v1-e8d51ed6fe4be397f8c6a123a976624b88f572b5abf
 
 /** @type {string} 使用AIモデル */
 
-const AI_MODEL = 'poolside/laguna-m.1:free';
+const AI_MODEL = 'nvidia/nemotron-3-ultra-550b-a55b:free';
 
  
 
