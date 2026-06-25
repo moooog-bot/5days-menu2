@@ -173,6 +173,20 @@ function showError(message) {
   });
 }
 
+/**
+ * エラー表示をクリアする
+ */
+function clearError() {
+  const errorArea = document.getElementById('errorArea');
+
+  if (!errorArea) {
+    return;
+  }
+
+  errorArea.textContent = '';
+  errorArea.style.display = 'none';
+}
+
 // =====================================================
 
 // メインフロー
